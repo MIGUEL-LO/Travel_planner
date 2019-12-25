@@ -9,13 +9,15 @@ class Route:
     
     def read_route(self):
         df = pd.read_csv(self.filename, names=['x1','y1','stop'])
+        # Fill nan values with 0
+        df.fillna(0,inplace=True)       
         # Make collapsed columns for positional dat
         df['x1, y1, stop'] = list(zip(df['x1'],df['y1'],df['stop']))
         # Make output list
         data_out = [(df.iloc[i]['x1, y1, stop']) for i in range(len(df))]
         return data_out
 
-    def plot_map(self): #filename):
+    def plot_map(self):
         route = self.read_route()
         max_x = max([n[0] for n in route]) + 5 # adds padding
         max_y = max([n[1] for n in route]) + 5
@@ -49,6 +51,6 @@ class Route:
 
 if __name__ == "__main__":
     obj = Route("route.csv")
-    print(obj.read_route())
-    print(obj.timetable())
+    print("This is the route of the bus =", obj.read_route())
+    print("This is the timetable of the bus =",obj.timetable())
     print(obj.plot_map())
