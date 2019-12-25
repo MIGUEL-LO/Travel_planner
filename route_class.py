@@ -31,7 +31,7 @@ class Route:
         ax.invert_yaxis()
         ax.set_aspect('equal', 'datalim')
         plt.show()
-        
+
 
     # stops is a dictionary holding the bus stop name and time of arrival. 
     # starting from 0 at stop A and taking 10 mins to reach checkpoints in  
@@ -49,8 +49,43 @@ class Route:
             time += 10
         return stops
 
+    def route_cc(self):
+        '''
+        Converts a set of route into a Freeman chain code
+        3 2 1
+        \ | /
+        4 - C - 0
+        / | \
+        5 6 7
+        '''
+        #starting cord of bus route
+        #Choosing bus stop A and giving (x,y) cord for it 
+        route = self.read_route()
+        start = route[0][:2]
+        cc = []
+        #dictionary containing Freeman chaid code
+        freeman_cc2coord = {0: (1, 0),
+                            1: (1, -1),
+                            2: (0, -1),
+                            3: (-1, -1),
+                            4: (-1, 0),
+                            5: (-1, 1),
+                            6: (0, 1),
+                            7: (1, 1)}
+        #dict other way around relative to the one above
+        freeman_coord2cc = {val: key for key,val in freeman_cc2coord.items()}
+        for b, a in zip(route[1:], route):
+            x_step = b[0] - a[0]
+            y_step = b[1] - a[1]
+            cc.append(str(freeman_coord2cc[(x_step, y_step)]))
+        return start, ''.join(cc)
+
+
 if __name__ == "__main__":
     obj = Route("route.csv")
     print("This is the route of the bus =", obj.read_route())
     print("This is the timetable of the bus =",obj.timetable())
     print(obj.plot_map())
+    start_point, cc = obj.route_cc()
+    print((f"The bus route starts at {start_point} and\n"
+    f"it's described by this chain code:\n{cc}"))
