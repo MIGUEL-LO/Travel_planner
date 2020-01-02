@@ -285,3 +285,11 @@ if __name__ == "__main__":
     journey.plot_bus_load()
     journey.print_time_stats()
     print(journey.travel_time(0))
+
+    john = Passenger(start=(0,2), end=(8,1), speed=15)
+    mary = Passenger(start=(0,0), end=(6,2), speed=12)  
+    john_mary = [john,mary]
+    journey2 = Journey(route,john_mary)
+    journey2.plot_bus_load()
+    journey2.print_time_stats()
+    print(journey2.travel_time(0))
