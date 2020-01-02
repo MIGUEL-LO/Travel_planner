@@ -27,12 +27,17 @@ class Passenger:
 
         return self.time
     def display(self):
+        '''
+        Displays the input values for the passenger 
+        '''
         print("start = ", self.x1 , self.y1)
         print("end = ", self.x2 , self.y2)
         print("speed = ", self.speed)
     
     def return_values(self):
-        
+        '''
+        Returns the values input for the passenger
+        '''
         return((self.x1, self.y1), (self.x2, self.y2), self.speed)
 
 
@@ -81,9 +86,12 @@ class Route:
     # stops is a dictionary holding the bus stop name and time of arrival. 
     # starting from 0 at stop A and taking 10 mins to reach checkpoints in  
     # the travel of bus
-    def timetable(self):
+    def timetable(self,bus_speed=10):
+        self.bus_speed = bus_speed
+        
         '''
         Generates a timetable for a route as minutes from its first stop.
+        With a user defined bus_speed otherwise default bus_speed = 10
         '''
         # stops is a dictionary holding the bus stop name and time of arrival. 
         # starting from 0 at stop A and taking 10 mins to reach checkpoints in  
@@ -95,9 +103,10 @@ class Route:
         for step in route1:
             if step[2]:
                 stops[step[2]] = time
-            time += 10
+            time += bus_speed
             
         return stops
+    
     
     def route_cc(self):
         '''
@@ -108,12 +117,12 @@ class Route:
         / | \
         5 6 7
         '''
-        #starting cord of bus route
-        #Choosing bus stop A and giving (x,y) cord for it 
+        # starting cord of bus route
+        # Choosing bus stop A and giving (x,y) cord for it 
         route = self.read_route()
         start = route[0][:2]
         cc = []
-        #dictionary containing Freeman chaid code
+        # dictionary containing Freeman chaid code
         freeman_cc2coord = {0: (1, 0),
                             1: (1, -1),
                             2: (0, -1),
@@ -122,17 +131,34 @@ class Route:
                             5: (-1, 1),
                             6: (0, 1),
                             7: (1, 1)}
-        #dict other way around relative to the one above
+        # dict other way around relative to the one above
         freeman_coord2cc = {val: key for key,val in freeman_cc2coord.items()}
         for b, a in zip(route[1:], route):
             x_step = b[0] - a[0]
             y_step = b[1] - a[1]
-            cc.append(str(freeman_coord2cc[(x_step, y_step)]))
-       
-        return start, ''.join(cc)
+            cc.append(int(freeman_coord2cc[(x_step, y_step)]))
 
-
-
+        return cc
+    
+    
+    def check_error(self):
+        '''
+        The bus is not allowed to move diagonally. This function checks wether the bus moves diagonally.
+        To then use the result from this function to either allow the input passenger route or not.
+        If the return value is > 0 then there is a diagonal movement, otherwise there isn't and the 
+        route is valid.
+        '''
+        is_odd = 0
+        for cc_number in self.route_cc():
+            if cc_number % 2 != 0:
+                is_odd += 1 
+        
+        if is_odd > 0:
+            
+            return 1
+        else:
+            
+            return 0
 
 ###################################
 ###################################
@@ -157,7 +183,6 @@ def read_passengers(file_name):
                 ,(df.iloc[i]['speed'])) for i in range(len(df))]
     
     return data_out
-
 class Journey(Route, Passenger):
     def __init__(self, class_route, passengers):
         self.class_route = class_route
@@ -167,8 +192,12 @@ class Journey(Route, Passenger):
         ''' 
         Returns the distance to the nearest bus stop to starting and ending location.
         '''
+
         start, end, pace = passenger
-        stops = [value for value in self.class_route.read_route() 
+        if self.class_route.check_error() > 0:
+            raise ValueError('The route file input contains a diagonal movement')
+        else:
+            stops = [value for value in self.class_route.read_route() 
                                                         if value[2]]
         # calculate closer stops
         # to start
@@ -190,7 +219,7 @@ class Journey(Route, Passenger):
         stops = {step[2]:0 for step in self.class_route.read_route()
                                                          if step[2]}
 
-        for self.passenger_id, passenger in self.passengers.items():
+        for passenger in self.passengers:
             trip = self.passenger_trip(passenger.return_values())
             stops[trip[0][1]] += 1
             stops[trip[1][1]] -= 1
@@ -204,6 +233,7 @@ class Journey(Route, Passenger):
         ax.set_xticklabels(list(stops.keys()))
         plt.show()
 
+        
     def passenger_trip_time(self,passenger):
         '''
         Finds the duration of the journey for the passenger onn the bus and walking.
@@ -218,14 +248,18 @@ class Journey(Route, Passenger):
         
         return(bus_travel, walk_travel) 
     
+    
     def travel_time(self, passenger_id):
         '''This returns a dictioanry containing how long the passenger was on the bus and how long they walked for'''
 
         self.bus_travel_time_dict = {}
-        for self.passenger_identification, passenger in self.passengers.items():
-            self.bus_travel_time_dict[self.passenger_identification] = {'bus':self.passenger_trip_time(passenger.return_values())[0]
+
+        for passenger_identification, passenger in enumerate(self.passengers):
+            self.bus_travel_time_dict[passenger_identification] = {'bus':self.passenger_trip_time(passenger.return_values())[0]
                                                                    ,'walk':self.passenger_trip_time(passenger.return_values())[1]}
+        
         return self.bus_travel_time_dict[passenger_id]
+    
     
     def print_time_stats(self):
         '''
@@ -233,7 +267,7 @@ class Journey(Route, Passenger):
         '''
         sum_bus_time = 0
         sum_walk_time = 0
-        for i, passenger in enumerate(self.passengers.values()):
+        for i, passenger in enumerate(self.passengers):
             sum_bus_time += self.passenger_trip_time(passenger.return_values())[0]
             sum_walk_time += self.passenger_trip_time(passenger.return_values())[1]
         average_bus_time = sum_bus_time/i 
@@ -242,15 +276,12 @@ class Journey(Route, Passenger):
               f"Average time walking: {average_walk_time:3.2f} minutes"))
 
 
-
 if __name__ == "__main__":
     route = Route("route.csv")
     passengers = read_passengers("passenger.csv")
     # passenger = ((0, 1), (3, 9), 16)
-    new_passenger_dict = {i: Passenger(start_end_speed[0],start_end_speed[1],start_end_speed[2])
-                        for i, start_end_speed in enumerate(read_passengers("passenger.csv"))}
-
-    journey = Journey(route,new_passenger_dict)
+    passengers_list = [Passenger(start,end,speed) for start, end, speed in read_passengers("passenger.csv")]
+    journey = Journey(route,passengers_list)
     journey.plot_bus_load()
     journey.print_time_stats()
-    
+    print(journey.travel_time(0))
