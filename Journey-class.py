@@ -443,6 +443,7 @@ class Journey(Route, Passenger):
                     print_bus_journey_direction(walk_distance_get_on_bus_stop, walk_distance_get_off_bus_stop
                                                 ,get_on_bus_stop, get_off_bus_stop)
 
+
 if __name__ == "__main__":
     route = Route("route.csv")
     passengers = read_passengers("passenger.csv")
@@ -454,7 +455,7 @@ if __name__ == "__main__":
         print(journey.travel_time(i))
     journey.print_time_stats()
     journey.recommended_route()
-
+    route.plot_map()
 
     print("---------------------------------------")
     john = Passenger(start=(0,2), end=(8,1), speed=15)
