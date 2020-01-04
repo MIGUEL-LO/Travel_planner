@@ -120,7 +120,6 @@ class Route:
         # starting cord of bus route
         # Choosing bus stop A and giving (x,y) cord for it 
         route = self.read_route()
-        start = route[0][:2]
         cc = []
         # dictionary containing Freeman chaid code
         freeman_cc2coord = {0: (1, 0),
@@ -198,7 +197,7 @@ class Journey(Route, Passenger):
         # Passed in a single passenger details from passangers containing the
         # starting location, ending location and pace of passenger.
         # pace = minutes per unit grid
-        start, end, pace = passenger
+        start, end = passenger[0], passenger[1]
         if self.class_route.check_error() > 0:
             raise ValueError('The route file input contains a diagonal movement')
         else:
