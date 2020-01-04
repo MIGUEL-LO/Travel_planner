@@ -363,11 +363,10 @@ class Journey(Route, Passenger):
         '''
         sum_bus_time = 0
         sum_walk_time = 0
-
-        for i, passenger in self.bus_travel_time_dict.items():
-            # print(i,':',passenger)
-            sum_bus_time += passenger['bus']
-            sum_walk_time += passenger['walk']
+        for i in range(len(self.passengers)):
+            # Uses the return values from the travel_time method to calculate the average
+            sum_bus_time += self.travel_time(i)['bus']
+            sum_walk_time += self.travel_time(i)['walk']
 
         average_bus_time = sum_bus_time/(i+1.0) 
         average_walk_time = sum_walk_time/(i+1.0)
@@ -453,7 +452,6 @@ if __name__ == "__main__":
     journey.plot_bus_load()
     for i in range(len(passengers_list)):
         print(journey.travel_time(i))
-    # print(journey.travel_time(0))
     journey.print_time_stats()
     journey.recommended_route()
 
