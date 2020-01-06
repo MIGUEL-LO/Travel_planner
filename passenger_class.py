@@ -1,41 +1,40 @@
 import pandas as pd
 import numpy as np
 from IPython.display import display
+# class MysteryError(Exception):
+#     pass
 
 class Passenger:
-    x1 = 0
-    y1 = 0
-    x2 = 0
-    y2 = 0
-    speed = 0
-    time = 0
-    # Not sure where to put passenger reading function
-    def __init__(self, start, end, speed):# filename):
-        self.x1 , self.y1 = start
-        self.x2 , self.y2 = end
+    def __init__(self, start, end, speed):
+        self.x1, self.y1 = start
+        self.x2, self.y2 = end
         self.speed = speed
-#         self.filename = filename
     def walk_time(self):
+        '''
+        Calculates the time it would take a passenger to reach the final destination
+        from their starting location.
+        '''
         self.time = np.sqrt((self.x2-self.x1)**2
-                       + (self.y2-self.y1)**2) * self.speed
-        print(f"The amount of time the passenger will walk for to get from starting location {self.x1 , self.y1},"
-              f" to the end location {self.x2 , self.y2},"
-              f" with speed {self.speed} is : {self.time :3.2f} minutes")
-    def display(self):
-        print(f"start =  {self.x1 , self.y1}")
-        print(f"end =  {self.x2 , self.y2}")
-        print(f"speed =  {self.speed}")
+                           + (self.y2-self.y1)**2) * self.speed
+
+        return self.time
+    
+    def return_values(self):
+        # if type(self.x1) or type(self.x2) or type(self.y1) or type(self.y2) or type(self.speed) == str:
+        if type(self.x1) == str:
+            raise Exception
+        elif type(self.x2) == str:
+            raise Exception
+        elif type(self.y1) == str:
+            raise Exception
+        elif type(self.y2) == str:
+            raise Exception
+        elif type(self.speed) == str:
+            raise Exception
         
-#     def read_passengers(self):
-#         df = pd.read_csv(self.filename, names=['x1','y1','x2','y2','speed'])
-#         # Make collapsed columns for positional dat
-#         df['x1, y1'] = list(zip(df['x1'],df['y1']))
-#         df['x2, y2'] = list(zip(df['x2'],df['y2']))
-#         # Make output list
-#         data_out = [(df.iloc[i]['x1, y1'], df.iloc[i]['x2, y2']
-#                     ,(df.iloc[i]['speed'])) for i in range(len(df))]
-#         return data_out
+        return((self.x1, self.y1), (self.x2, self.y2), self.speed)
+
+
 if __name__ == "__main__":
-    obj = Passenger((1,2),(3,4),5)#,"passenger.csv")
-    print(obj.display())
+    obj = Passenger((1,2),(3,4),5)
     print(obj.walk_time())
