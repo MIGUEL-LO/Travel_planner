@@ -22,7 +22,7 @@ class Route:
         return data_out    
     
     
-    def plot_map(self): #filename):
+    def plot_map(self):
         route = self.read_route()
         max_x = max([n[0] for n in route]) + 5 # adds padding
         max_y = max([n[1] for n in route]) + 5

@@ -30,6 +30,10 @@ def test_route_cc():
     route = Route("route.csv")
     assert route.route_cc() == [6, 6, 6, 0, 0, 2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 2, 2, 2]
 
-def test_check_error():
+def test_check_error_no_diag():
     route = Route("route.csv")
     assert route.check_error() == 0
+
+def test_check_error_diag():
+    route = Route("wrong_route.csv")
+    assert route.check_error() == 1
