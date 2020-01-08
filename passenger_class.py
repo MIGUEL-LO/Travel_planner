@@ -1,13 +1,13 @@
 import pandas as pd
 import numpy as np
-# class MysteryError(Exception):
-#     pass
+
 
 class Passenger:
     def __init__(self, start, end, speed):
         self.x1, self.y1 = start
         self.x2, self.y2 = end
         self.speed = speed
+
     def walk_time(self):
         '''
         Calculates the time it would take a passenger to reach the final destination
