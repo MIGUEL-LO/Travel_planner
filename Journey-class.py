@@ -456,7 +456,7 @@ if __name__ == "__main__":
     journey.recommended_route()
     route.plot_map()
 
-    print("---------------------------------------")
+    print("----------------------------------------")
     john = Passenger(start=(0,2), end=(8,1), speed=15)
     mary = Passenger(start=(0,0), end=(6,2), speed=12)  
     john_mary = [john,mary]
