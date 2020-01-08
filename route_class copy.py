@@ -28,12 +28,6 @@ class Route:
         max_y = max([n[1] for n in route]) + 5
         grid = np.zeros((max_y, max_x))
         for x,y,stop in route:
-            if type(x) == str:
-                raise Exception
-            elif type(y) == str:
-                raise Exception
-            elif type(stop) != str:
-                raise Exception
             grid[y, x] = 1
             if stop:
                 grid[y, x] += 1
@@ -49,12 +43,11 @@ class Route:
     # the travel of bus
     def timetable(self,bus_speed=10):
         self.bus_speed = bus_speed
+        
         '''
         Generates a timetable for a route as minutes from its first stop.
         With a user defined bus_speed otherwise default bus_speed = 10
         '''
-        if type(self.bus_speed) == str:
-            raise Exception
         # stops is a dictionary holding the bus stop name and time of arrival. 
         # starting from 0 at stop A and taking 10 mins to reach checkpoints in  
         # the travel of bus.
@@ -120,6 +113,7 @@ class Route:
         else:
             
             return 0
+
 
 
 if __name__ == "__main__":
