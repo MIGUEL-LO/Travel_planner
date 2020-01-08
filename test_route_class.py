@@ -13,14 +13,14 @@ def test_read_route():
     (0, 2, 0), (0, 1, 0), (0, 0, 'G')]
 
 def test_plot_map():
-    route = Route("wrong_route.csv")
+    route = [(9, 'B', 'A'), (9, 8, 0), (9, 9, 0), (9, 10, 'B')]
     with pytest.raises(Exception):
-        route.plot_map()
+        Route(route).plot_map(route)
 
 def test_timetable_speed():
-    route = Route("wrong_route.csv")
+    route = [(9, 7, 'A'), (9, 8, 0), (9, 9, 0), (9, 10, 'B')]
     with pytest.raises(Exception):
-        route.timetable('A')
+        Route(route).timetable('A')
 
 def test_timetable():
     route = Route("route.csv")
@@ -35,5 +35,6 @@ def test_check_error_no_diag():
     assert route.check_error() == 0
 
 def test_check_error_diag():
-    route = Route("wrong_route.csv")
-    assert route.check_error() == 1
+    route = [(9, 7, 'A'), (9, 8, 0), (9, 9, 0), (10, 10, 'B')]
+    # Route(route).route_cc(route)
+    assert Route(route).check_error(route) == 1
