@@ -9,15 +9,20 @@ class Passenger:
         self.speed = speed
 
         if type(self.x1) == str:
-            raise Exception('x_1 coordinate should not be a letter but a number')
+            raise Exception('x_1 coordinate should not be a letter but a number.'
+                            'The value of x_1 was: {}'.format(self.x1))
         elif type(self.x2) == str:
-            raise Exception('x_2 coordinate should not be a letter but a number')
+            raise Exception('x_2 coordinate should not be a letter but a number.'
+                            'The value of x_2 was: {}'.format(self.x2))
         elif type(self.y1) == str:
-            raise Exception('y_1 coordinate should not be a letter but a number')
+            raise Exception('y_1 coordinate should not be a letter but a number.'
+                            'The value of y_1 was: {}'.format(self.y1))
         elif type(self.y2) == str:
-            raise Exception('y_2 coordinate should not be a letter but a number')
+            raise Exception('y_2 coordinate should not be a letter but a number.'
+                            'The value of y_2 was: {}'.format(self.y2))
         elif type(self.speed) == str:
-            raise Exception('speed should not be a letter but a number')
+            raise Exception('speed should not be a letter but a number.'
+                            'The value of speed was: {}'.format(self.speed))
         
     def walk_time(self):
         '''
