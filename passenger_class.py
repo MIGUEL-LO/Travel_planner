@@ -8,6 +8,17 @@ class Passenger:
         self.x2, self.y2 = end
         self.speed = speed
 
+        if type(self.x1) == str:
+            raise Exception('x_1 coordinate should not be a letter but a number')
+        elif type(self.x2) == str:
+            raise Exception('x_2 coordinate should not be a letter but a number')
+        elif type(self.y1) == str:
+            raise Exception('y_1 coordinate should not be a letter but a number')
+        elif type(self.y2) == str:
+            raise Exception('y_2 coordinate should not be a letter but a number')
+        elif type(self.speed) == str:
+            raise Exception('speed should not be a letter but a number')
+        
     def walk_time(self):
         '''
         Calculates the time it would take a passenger to reach the final destination
@@ -20,20 +31,12 @@ class Passenger:
     
     def return_values(self):
         # if type(self.x1) or type(self.x2) or type(self.y1) or type(self.y2) or type(self.speed) == str:
-        if type(self.x1) == str:
-            raise Exception
-        elif type(self.x2) == str:
-            raise Exception
-        elif type(self.y1) == str:
-            raise Exception
-        elif type(self.y2) == str:
-            raise Exception
-        elif type(self.speed) == str:
-            raise Exception
-        
+
         return((self.x1, self.y1), (self.x2, self.y2), self.speed)
 
 
 if __name__ == "__main__":
     obj = Passenger((1,2),(3,4),5)
+    new_obj = Passenger((1,'one'),(3,4),5)
     print(obj.walk_time())
+    print(new_obj.walk_time())
