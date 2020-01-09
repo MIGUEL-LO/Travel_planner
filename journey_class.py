@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-from IPython.display import display
 import matplotlib.pyplot as plt
 import math
 from string import ascii_uppercase

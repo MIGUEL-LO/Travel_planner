@@ -23,4 +23,4 @@ def test_passenger_walk_distance_to_from_bus_stop():
     passengers = read_passengers("passenger.csv") 
     passenger = ((0, 1), (3, 9), 16)
     journey = Journey(route,passengers)
-    assert journey.passenger_walk_distance_to_from_bus_stop(passenger) == (1.0, 6.324555320336759)    
+    assert journey.passenger_walk_distance_to_from_bus_stop(passenger) == (1.0, 6.324555320336759)
