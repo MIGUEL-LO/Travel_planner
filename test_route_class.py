@@ -8,8 +8,8 @@ import pytest
 class Test_route_class:
 
     def test_read_route(self):
-        route = Route("route.csv")
-        assert route.read_route() == [(9, 7, 'A'), (9, 8, 0), (9, 9, 0), (9, 10, 0), \
+        self.route = Route("route.csv")
+        assert self.route.read_route() == [(9, 7, 'A'), (9, 8, 0), (9, 9, 0), (9, 10, 0), \
         (10, 10, 0), (11, 10, 0), (11, 9, 0), (11, 8, 'B'), (11, 7, 'C'), (11, 6, 0), \
         (11, 5, 0), (11, 4, 0), (11, 3, 0), (10, 3, 'D'), (9, 3, 0), (8, 3, 0), (7, 3, 'E'), \
         (6, 3, 0), (5, 3, 0), (4, 3, 0), (3, 3, 0), (2, 3, 0), (1, 3, 'F'), (0, 3, 0),\

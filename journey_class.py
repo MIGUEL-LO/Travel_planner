@@ -11,6 +11,7 @@ from string import ascii_uppercase
 ###################################
 ###################################
 
+
 class Passenger:
     def __init__(self, start, end, speed):
         self.x1, self.y1 = start
@@ -44,7 +45,6 @@ class Passenger:
         return self.time
     
     def return_values(self):
-        # if type(self.x1) or type(self.x2) or type(self.y1) or type(self.y2) or type(self.speed) == str:
 
         return((self.x1, self.y1), (self.x2, self.y2), self.speed)
 
@@ -64,25 +64,23 @@ class Route:
          This reads the bus route csv file and returns a list containing touples 
          with the route of the bus and the name of the bus stops.    
         '''
-        df = pd.read_csv(self.route, names=['x1','y1','stop'])
-        df.fillna(0,inplace=True)
-        # Make collapsed columns for positional dat
-        df['x1, y1, stop'] = list(zip(df['x1'],df['y1'],df['stop']))
-        # Make output list
-        data_out = [(df.iloc[i]['x1, y1, stop']) for i in range(len(df))]
-        
-        return data_out    
-    
-    
-    def plot_map(self, route_input=None):
-        if route_input:
-            route = route_input
+        if type(self.route) == list:
+            return self.route
         else:
-            route = self.read_route()
+            df = pd.read_csv(self.route, names=['x1','y1','stop'])
+            df.fillna(0,inplace=True)
+            # Make collapsed columns for positional dat
+            df['x1, y1, stop'] = list(zip(df['x1'],df['y1'],df['stop']))
+            # Make output list
+            data_out = [(df.iloc[i]['x1, y1, stop']) for i in range(len(df))]
+        
+            return data_out    
+    
+    
+    def plot_map(self):
 
-        max_x = max([n[0] for n in route]) + 5 # adds padding
-        max_y = max([n[1] for n in route]) + 5
-        grid = np.zeros((max_y, max_x))
+        route = self.read_route()
+
         for x,y,stop in route:
             if type(x) == str:
                 raise Exception('The bus journey x coordinate should not be a letter but a number.'
@@ -93,9 +91,17 @@ class Route:
             elif type(stop) != str and stop != 0:
                 raise Exception('The bus journey bus stop should not be a number but a letter.'
                             'The value of x was: {}'.format(stop))
+                            
+        max_x = max([n[0] for n in route]) + 5 # adds padding
+        max_y = max([n[1] for n in route]) + 5
+        grid = np.zeros((max_y, max_x))
+
+        for x,y,stop in route:
+
             grid[y, x] = 1
             if stop:
                 grid[y, x] += 1
+
         fig, ax = plt.subplots(1, 1)
         ax.pcolor(grid)
         ax.invert_yaxis()
@@ -106,7 +112,7 @@ class Route:
     # stops is a dictionary holding the bus stop name and time of arrival. 
     # starting from 0 at stop A and taking 10 mins to reach checkpoints in  
     # the travel of bus
-    def timetable(self,bus_speed=10,route_input=None):
+    def timetable(self,bus_speed=10):
         self.bus_speed = bus_speed
         '''
         Generates a timetable for a route as minutes from its first stop.
@@ -119,10 +125,8 @@ class Route:
         # starting from 0 at stop A and taking 10 mins to reach checkpoints in  
         # the travel of bus.
         # can potentially change the speed
-        if route_input:
-            route = route_input
-        else:
-            route = self.read_route()
+
+        route = self.read_route()
         time = 0
         stops = {}
         for step in route:
@@ -133,7 +137,7 @@ class Route:
         return stops
     
     
-    def route_cc(self,route_input=None):
+    def route_cc(self):
         '''
         Converts a set of route into a Freeman chain code
         3 2 1
@@ -144,10 +148,8 @@ class Route:
         '''
         # starting cord of bus route
         # Choosing bus stop A and giving (x,y) cord for it 
-        if route_input:
-            route = route_input
-        else:
-            route = self.read_route()
+
+        route = self.read_route()
         cc = []
         # dictionary containing Freeman chaid code
         freeman_cc2coord = {0: (1, 0),
@@ -168,19 +170,14 @@ class Route:
         return cc
     
     
-    def check_error(self,route_input=None):
+    def check_error(self):
         '''
         The bus is not allowed to move diagonally. This function checks wether the bus moves diagonally.
         To then use the result from this function to either allow the input passenger route or not.
         If the return value is > 0 then there is a diagonal movement, otherwise there isn't and the 
         route is valid.
         '''
-        if route_input:
-            route = route_input
-            route_cc = self.route_cc(route)
-        else:
-            route = self.read_route()
-            route_cc = self.route_cc()
+        route_cc = self.route_cc()
 
         is_odd = 0
         for cc_number in route_cc:
@@ -202,8 +199,6 @@ class Route:
 ###################################
 
 
-
-
 def read_passengers(file_name):    
     '''
     Reads the passengers csv file and returns a list containing touples with the 
@@ -221,8 +216,8 @@ def read_passengers(file_name):
 
 
 class Journey(Route, Passenger):
-    def __init__(self, class_route, passengers):
-        self.class_route = class_route
+    def __init__(self, route, passengers):
+        self.route = route
         self.passengers = passengers
         self.bus_travel_time_dict = {}
         
@@ -233,13 +228,36 @@ class Journey(Route, Passenger):
         # Passed in a single passenger details from passangers containing the
         # starting location, ending location and pace of passenger.
         # pace = minutes per unit grid
-        start, end = passenger[0], passenger[1]
-        if self.class_route.check_error() > 0:
-            raise ValueError('The route file input contains a diagonal movement')
+        # check if the passenger file is valid 
+        
+        # for start, end, speed in passenger:
+            # if type(start[0]) == str or type(start[1]) == str :
+            #     raise Exception('The passenger starting coordinate contains a wrong input.'
+            #                 'The value of the starting coordinate: {}'.format(start))
+            # elif type(end[0]) == str or type(end[1]) == str:
+            #     raise Exception('The passenger end coordinate contains a wrong input.'
+            #                 'The value of the end coordinate: {}'.format(end))
+            # elif type(speed) == str:
+            #     raise Exception('The passenger speed contains is of wrong input.'
+            #                 'The value of the speed: {}'.format(speed))
+
+        start, end, speed = passenger[0], passenger[1], passenger[2]
+        if type(start[0]) == str or type(start[1]) == str :
+            raise Exception('The passenger starting coordinate contains a wrong input.'
+                        'The value of the starting coordinate: {}'.format(start))
+        elif type(end[0]) == str or type(end[1]) == str:
+            raise Exception('The passenger end coordinate contains a wrong input.'
+                        'The value of the end coordinate: {}'.format(end))
+        elif type(speed) == str:
+            raise Exception('The passenger speed contains is of wrong input.'
+                        'The value of the speed: {}'.format(speed))
+
+        if self.route.check_error() > 0:
+            raise ValueError('The bus route has a diagonal movement')
         else:
             # Stops holds the cordinates for a bus stop in the bus route journey.
             # unpacked stops into x, y, stop. 
-            stops = [value for value in self.class_route.read_route() 
+            stops = [value for value in self.route.read_route() \
                                                         if value[2]]
     
         # The distance to the closest bus stop for a passenger
@@ -315,7 +333,7 @@ class Journey(Route, Passenger):
         '''
         Shows the amount of people on the bus during the bus journey.
         '''
-        stops = {step[2]:0 for step in self.class_route.read_route()
+        stops = {step[2]:0 for step in self.route.read_route()
                                                          if step[2]}
         for passenger in self.passengers:
             bus_stop_name = self.passenger_get_on_off_bus_stop_name(passenger.return_values())
@@ -360,7 +378,7 @@ class Journey(Route, Passenger):
         walk_distance_get_off_bus_stop = walk_to_from_bus_stop[1]
         
         # The bus route timetable.
-        bus_times = self.class_route.timetable()
+        bus_times = self.route.timetable()
         
         # Calculating the length of the bus ride.
         bus_travel = bus_times[get_off_bus_stop] - \
@@ -482,24 +500,32 @@ class Journey(Route, Passenger):
 if __name__ == "__main__":
     route = Route("route.csv")
     passengers = read_passengers("passenger.csv")
-    # passenger = ((0, 1), (3, 9), 16)
-    passengers_list = [Passenger(start,end,speed) for start, end, speed in passengers]
-    journey = Journey(route,passengers_list)
-    journey.plot_bus_load()
-    for i in range(len(passengers_list)):
-        print(journey.travel_time(i))
-    journey.print_time_stats()
-    journey.recommended_route()
-    route.plot_map()
+    print(passengers)
+    passenger = ((0, 1), (3, 9), 16)
+    journey = Journey(route,passengers)
+    print(journey.passenger_trip(passenger))
+    print(journey.passenger_get_on_off_bus_stop_name(passenger))
+    print(journey.passenger_walk_distance_to_from_bus_stop(passenger))
 
-    print("----------------------------------------")
-    john = Passenger(start=(0,2), end=(8,1), speed=15)
-    mary = Passenger(start=(0,0), end=(6,2), speed=12)  
-    john_mary = [john,mary]
-    journey2 = Journey(route,john_mary)
-    journey2.plot_bus_load()
-    for i in range(len(john_mary)):
-        print(journey2.travel_time(i))
-    # print(journey.travel_time(0))
-    journey2.print_time_stats()
-    journey2.recommended_route()
+
+      
+    # passengers_list = [Passenger(start,end,speed) for start, end, speed in passengers]
+    # journey = Journey(route,passengers_list)
+    # journey.plot_bus_load()
+    # for i in range(len(passengers_list)):
+    #     print(journey.travel_time(i))
+    # journey.print_time_stats()
+    # journey.recommended_route()
+    # route.plot_map()
+
+    # print("----------------------------------------")
+    # john = Passenger(start=(0,2), end=(8,1), speed=15)
+    # mary = Passenger(start=(0,0), end=(6,2), speed=12)  
+    # john_mary = [john,mary]
+    # journey2 = Journey(route,john_mary)
+    # journey2.plot_bus_load()
+    # for i in range(len(john_mary)):
+    #     print(journey2.travel_time(i))
+    # # print(journey.travel_time(0))
+    # journey2.print_time_stats()
+    # journey2.recommended_route()
