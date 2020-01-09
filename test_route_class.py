@@ -25,7 +25,7 @@ class Test_route_class:
     )
     def test_plot_map(self,route):
         with pytest.raises(Exception):
-            Route(route).plot_map(route)
+            Route(route).plot_map()
 
 
     @pytest.mark.parametrize(
@@ -63,4 +63,4 @@ class Test_route_class:
         ]
     )
     def test_check_error_diag(self,route):
-        assert Route(route).check_error(route) == 1
+        assert Route(route).check_error() == 1
