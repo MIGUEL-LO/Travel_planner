@@ -3,6 +3,7 @@ import pytest
 # might turn into a class and find a method to create multiple tests with varibles
 # the values used to assert the functions are manually put in, might need to use
 # an automated form
+#can i parametrize
 
 def test_read_route():
     route = Route("route.csv")

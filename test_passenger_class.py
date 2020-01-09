@@ -2,7 +2,7 @@ from passenger_class import Passenger
 import numpy as np
 import pytest
 
-
+#can i parametrize
 def test_Passenger_return_values():
     passenger = Passenger((1,2),(3,4),5)
     assert passenger.return_values() == ((1,2),(3,4),5)
