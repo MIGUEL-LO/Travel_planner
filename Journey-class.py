@@ -11,12 +11,28 @@ from string import ascii_uppercase
 ###################################
 ###################################
 
-
 class Passenger:
     def __init__(self, start, end, speed):
         self.x1, self.y1 = start
         self.x2, self.y2 = end
         self.speed = speed
+
+        if type(self.x1) == str:
+            raise Exception('x_1 coordinate should not be a letter but a number.'
+                            'The value of x_1 was: {}'.format(self.x1))
+        elif type(self.x2) == str:
+            raise Exception('x_2 coordinate should not be a letter but a number.'
+                            'The value of x_2 was: {}'.format(self.x2))
+        elif type(self.y1) == str:
+            raise Exception('y_1 coordinate should not be a letter but a number.'
+                            'The value of y_1 was: {}'.format(self.y1))
+        elif type(self.y2) == str:
+            raise Exception('y_2 coordinate should not be a letter but a number.'
+                            'The value of y_2 was: {}'.format(self.y2))
+        elif type(self.speed) == str:
+            raise Exception('speed should not be a letter but a number.'
+                            'The value of speed was: {}'.format(self.speed))
+        
     def walk_time(self):
         '''
         Calculates the time it would take a passenger to reach the final destination
@@ -26,20 +42,11 @@ class Passenger:
                            + (self.y2-self.y1)**2) * self.speed
 
         return self.time
-    def display(self):
-        '''
-        Displays the input values for the passenger 
-        '''
-        print("start = ", self.x1 , self.y1)
-        print("end = ", self.x2 , self.y2)
-        print("speed = ", self.speed)
     
     def return_values(self):
-        '''
-        Returns the values input for the passenger
-        '''
-        return((self.x1, self.y1), (self.x2, self.y2), self.speed)
+        # if type(self.x1) or type(self.x2) or type(self.y1) or type(self.y2) or type(self.speed) == str:
 
+        return((self.x1, self.y1), (self.x2, self.y2), self.speed)
 
 ###################################
 ###################################
@@ -67,12 +74,25 @@ class Route:
         return data_out    
     
     
-    def plot_map(self): #filename):
-        route = self.read_route()
+    def plot_map(self, route_input=None):
+        if route_input:
+            route = route_input
+        else:
+            route = self.read_route()
+
         max_x = max([n[0] for n in route]) + 5 # adds padding
         max_y = max([n[1] for n in route]) + 5
         grid = np.zeros((max_y, max_x))
         for x,y,stop in route:
+            if type(x) == str:
+                raise Exception('The bus journey x coordinate should not be a letter but a number.'
+                            'The value of x was: {}'.format(x))
+            elif type(y) == str:
+                raise Exception('The bus journey y coordinate should not be a letter but a number.'
+                            'The value of y was: {}'.format(y))
+            elif type(stop) != str and stop != 0:
+                raise Exception('The bus journey bus stop should not be a number but a letter.'
+                            'The value of x was: {}'.format(stop))
             grid[y, x] = 1
             if stop:
                 grid[y, x] += 1
@@ -86,21 +106,26 @@ class Route:
     # stops is a dictionary holding the bus stop name and time of arrival. 
     # starting from 0 at stop A and taking 10 mins to reach checkpoints in  
     # the travel of bus
-    def timetable(self,bus_speed=10):
+    def timetable(self,bus_speed=10,route_input=None):
         self.bus_speed = bus_speed
-        
         '''
         Generates a timetable for a route as minutes from its first stop.
         With a user defined bus_speed otherwise default bus_speed = 10
         '''
+        if type(self.bus_speed) == str:
+            raise Exception('The speed of the bus should not be a letter but a number.'
+                            'The value of bus_speed was: {}'.format(self.bus_speed))
         # stops is a dictionary holding the bus stop name and time of arrival. 
         # starting from 0 at stop A and taking 10 mins to reach checkpoints in  
         # the travel of bus.
         # can potentially change the speed
-        route1 = self.read_route()
+        if route_input:
+            route = route_input
+        else:
+            route = self.read_route()
         time = 0
         stops = {}
-        for step in route1:
+        for step in route:
             if step[2]:
                 stops[step[2]] = time
             time += bus_speed
@@ -108,7 +133,7 @@ class Route:
         return stops
     
     
-    def route_cc(self):
+    def route_cc(self,route_input=None):
         '''
         Converts a set of route into a Freeman chain code
         3 2 1
@@ -119,7 +144,10 @@ class Route:
         '''
         # starting cord of bus route
         # Choosing bus stop A and giving (x,y) cord for it 
-        route = self.read_route()
+        if route_input:
+            route = route_input
+        else:
+            route = self.read_route()
         cc = []
         # dictionary containing Freeman chaid code
         freeman_cc2coord = {0: (1, 0),
@@ -140,15 +168,22 @@ class Route:
         return cc
     
     
-    def check_error(self):
+    def check_error(self,route_input=None):
         '''
         The bus is not allowed to move diagonally. This function checks wether the bus moves diagonally.
         To then use the result from this function to either allow the input passenger route or not.
         If the return value is > 0 then there is a diagonal movement, otherwise there isn't and the 
         route is valid.
         '''
+        if route_input:
+            route = route_input
+            route_cc = self.route_cc(route)
+        else:
+            route = self.read_route()
+            route_cc = self.route_cc()
+
         is_odd = 0
-        for cc_number in self.route_cc():
+        for cc_number in route_cc:
             if cc_number % 2 != 0:
                 is_odd += 1 
         
@@ -158,6 +193,7 @@ class Route:
         else:
             
             return 0
+
 
 ###################################
 ###################################
