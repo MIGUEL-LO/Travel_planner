@@ -35,7 +35,6 @@ class Passenger:
         return self.time
     
     def return_values(self):
-        # if type(self.x1) or type(self.x2) or type(self.y1) or type(self.y2) or type(self.speed) == str:
 
         return((self.x1, self.y1), (self.x2, self.y2), self.speed)
 

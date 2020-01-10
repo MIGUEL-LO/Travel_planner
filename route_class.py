@@ -12,25 +12,23 @@ class Route:
          This reads the bus route csv file and returns a list containing touples 
          with the route of the bus and the name of the bus stops.    
         '''
-        df = pd.read_csv(self.route, names=['x1','y1','stop'])
-        df.fillna(0,inplace=True)
-        # Make collapsed columns for positional dat
-        df['x1, y1, stop'] = list(zip(df['x1'],df['y1'],df['stop']))
-        # Make output list
-        data_out = [(df.iloc[i]['x1, y1, stop']) for i in range(len(df))]
-        
-        return data_out    
-    
-    
-    def plot_map(self, route_input=None):
-        if route_input:
-            route = route_input
+        if type(self.route) == list:
+            return self.route
         else:
-            route = self.read_route()
+            df = pd.read_csv(self.route, names=['x1','y1','stop'])
+            df.fillna(0,inplace=True)
+            # Make collapsed columns for positional dat
+            df['x1, y1, stop'] = list(zip(df['x1'],df['y1'],df['stop']))
+            # Make output list
+            data_out = [(df.iloc[i]['x1, y1, stop']) for i in range(len(df))]
+        
+            return data_out    
+    
+    
+    def plot_map(self):
 
-        max_x = max([n[0] for n in route]) + 5 # adds padding
-        max_y = max([n[1] for n in route]) + 5
-        grid = np.zeros((max_y, max_x))
+        route = self.read_route()
+
         for x,y,stop in route:
             if type(x) == str:
                 raise Exception('The bus journey x coordinate should not be a letter but a number.'
@@ -41,9 +39,17 @@ class Route:
             elif type(stop) != str and stop != 0:
                 raise Exception('The bus journey bus stop should not be a number but a letter.'
                             'The value of x was: {}'.format(stop))
+                            
+        max_x = max([n[0] for n in route]) + 5 # adds padding
+        max_y = max([n[1] for n in route]) + 5
+        grid = np.zeros((max_y, max_x))
+
+        for x,y,stop in route:
+
             grid[y, x] = 1
             if stop:
                 grid[y, x] += 1
+
         fig, ax = plt.subplots(1, 1)
         ax.pcolor(grid)
         ax.invert_yaxis()
@@ -54,7 +60,7 @@ class Route:
     # stops is a dictionary holding the bus stop name and time of arrival. 
     # starting from 0 at stop A and taking 10 mins to reach checkpoints in  
     # the travel of bus
-    def timetable(self,bus_speed=10,route_input=None):
+    def timetable(self,bus_speed=10):
         self.bus_speed = bus_speed
         '''
         Generates a timetable for a route as minutes from its first stop.
@@ -67,10 +73,8 @@ class Route:
         # starting from 0 at stop A and taking 10 mins to reach checkpoints in  
         # the travel of bus.
         # can potentially change the speed
-        if route_input:
-            route = route_input
-        else:
-            route = self.read_route()
+
+        route = self.read_route()
         time = 0
         stops = {}
         for step in route:
@@ -81,7 +85,7 @@ class Route:
         return stops
     
     
-    def route_cc(self,route_input=None):
+    def route_cc(self):
         '''
         Converts a set of route into a Freeman chain code
         3 2 1
@@ -92,10 +96,8 @@ class Route:
         '''
         # starting cord of bus route
         # Choosing bus stop A and giving (x,y) cord for it 
-        if route_input:
-            route = route_input
-        else:
-            route = self.read_route()
+
+        route = self.read_route()
         cc = []
         # dictionary containing Freeman chaid code
         freeman_cc2coord = {0: (1, 0),
@@ -116,19 +118,14 @@ class Route:
         return cc
     
     
-    def check_error(self,route_input=None):
+    def check_error(self):
         '''
         The bus is not allowed to move diagonally. This function checks wether the bus moves diagonally.
         To then use the result from this function to either allow the input passenger route or not.
         If the return value is > 0 then there is a diagonal movement, otherwise there isn't and the 
         route is valid.
         '''
-        if route_input:
-            route = route_input
-            route_cc = self.route_cc(route)
-        else:
-            route = self.read_route()
-            route_cc = self.route_cc()
+        route_cc = self.route_cc()
 
         is_odd = 0
         for cc_number in route_cc:
@@ -144,10 +141,18 @@ class Route:
 
 
 if __name__ == "__main__":
-    obj = Route("route.csv")
-    print("This is the route of the bus =", obj.read_route())
-    print("This is the timetable of the bus =",obj.timetable())
-    obj.plot_map()
-    cc = obj.route_cc()
+    # obj = Route("route.csv")
+    # print("This is the route of the bus =", obj.read_route())
+    # print("This is the timetable of the bus =",obj.timetable())
+    # obj.plot_map()
+    # cc = obj.route_cc()
+    # print((f"The bus route is described by this chain code:\n{cc}"))
+    # print(obj.check_error())
+    print("----------------------checking error excemtion works----------------------------------")
+    new_route = Route([(9 ,7, 'A'), (9, 8, 0), (9, 9, 0), (9, 10, 'B')])
+    print("This is the route of the bus =", new_route.read_route())
+    print("This is the timetable of the bus =", new_route.timetable())
+    new_route.plot_map()
+    cc = new_route.route_cc()
     print((f"The bus route is described by this chain code:\n{cc}"))
-    print(obj.check_error())
+    print(new_route.check_error())
