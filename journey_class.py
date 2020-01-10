@@ -228,17 +228,6 @@ class Journey(Route, Passenger):
         # starting location, ending location and pace of passenger.
         # pace = minutes per unit grid
         # check if the passenger file is valid 
-        
-        # for start, end, speed in passenger:
-            # if type(start[0]) == str or type(start[1]) == str :
-            #     raise Exception('The passenger starting coordinate contains a wrong input.'
-            #                 'The value of the starting coordinate: {}'.format(start))
-            # elif type(end[0]) == str or type(end[1]) == str:
-            #     raise Exception('The passenger end coordinate contains a wrong input.'
-            #                 'The value of the end coordinate: {}'.format(end))
-            # elif type(speed) == str:
-            #     raise Exception('The passenger speed contains is of wrong input.'
-            #                 'The value of the speed: {}'.format(speed))
 
         start, end, speed = passenger[0], passenger[1], passenger[2]
         if type(start[0]) == str or type(start[1]) == str :
@@ -472,13 +461,6 @@ class Journey(Route, Passenger):
                     walk_distance_get_on_bus_stop = walk_to_from_bus_stop[0]
                     walk_distance_get_off_bus_stop = walk_to_from_bus_stop[1]
                     total_time = bus_travel + walk_travel
-                    # def print_bus_journey_direction(walk_distance_get_on_bus_stop, walk_distance_get_off_bus_stop
-                    #                                 ,get_on_bus_stop, get_off_bus_stop):
-                        # return("If you take the bus, you should take this route:\n"
-                        #     f" Walk {walk_distance_get_on_bus_stop:3.2f} units to stop {get_on_bus_stop}, \n"
-                        #     f" get on the bus and aligth at stop {get_off_bus_stop} and \n"
-                        #     f" walk {walk_distance_get_off_bus_stop:3.2f} units to your destination.\n"
-                        #     f" Total time of travel: {total_time:03.2f} minutes.")
                         
                     if walking_time > total_time:
                         # Print journey option when walking takes longer than the bus ride
@@ -494,8 +476,6 @@ class Journey(Route, Passenger):
 
                     elif round(walking_time,0) == round(total_time,0):
                         # Rounds the time to nearest minute to allow the passenger to make the better decision
-                        # print((f"You can either walk or take the bus, both journey methods take : {walking_time:03.2f} minutes. "
-                        #         f"The total time of travel if you walked is: {walking_time:03.2f} minutes. \n"))
 
                         return(f"Trip for passenger: {passenger_id}\n"
                             f"You can either walk or take the bus, both journey methods take : {walking_time:03.2f} minutes. "
@@ -505,8 +485,7 @@ class Journey(Route, Passenger):
                             f"get on the bus and aligth at stop {get_off_bus_stop} and \n"
                             f"walk {walk_distance_get_off_bus_stop:3.2f} units to your destination.\n"
                             f"Total time of travel: {total_time:03.2f} minutes.")                                
-                        # print_bus_journey_direction(walk_distance_get_on_bus_stop, walk_distance_get_off_bus_stop
-                        #                             ,get_on_bus_stop, get_off_bus_stop)
+
 
                     else:
                         # Print journey option when taking the bus takes longer than walking
@@ -523,38 +502,27 @@ class Journey(Route, Passenger):
 
 
 if __name__ == "__main__":
-    # route = Route("route.csv")
-    # passengers = read_passengers("passenger.csv")
-
     route = Route("route.csv")
     passengers = read_passengers("passenger.csv")
-
-    # passenger = ((0, 1), (3, 9), 16)
-    # print(journey.passenger_trip(passenger))
-    # print(journey.passenger_get_on_off_bus_stop_name(passenger))
-    # print(journey.passenger_walk_distance_to_from_bus_stop(passenger))
-
     passengers_list = [Passenger(start,end,speed) for start, end, speed in passengers]
     journey = Journey(route,passengers_list)
-    # print(journey.plot_bus_load(1))
-    # print(journey.passenger_trip_time(((10, 11), (18, 0), 16)))
-    # print(journey.plot_bus_load())
-    # for i in range(len(passengers_list)):
-    #     print(journey.travel_time(i))
-    # journey.print_time_stats()
+    print(journey.plot_bus_load())
+    for i in range(len(passengers_list)):
+        print(journey.travel_time(i))
+    journey.print_time_stats()
     for i in range(len(passengers_list)):
         print(journey.recommended_route_for_passenger(i))
-    # print(journey.recommended_route_for_passenger(0))
-    # route.plot_map()
+    route.plot_map()
 
-    # print("----------------------------------------")
-    # john = Passenger(start=(0,2), end=(8,1), speed=15)
-    # mary = Passenger(start=(0,0), end=(6,2), speed=12)  
-    # john_mary = [john,mary]
-    # journey2 = Journey(route,john_mary)
-    # journey2.plot_bus_load()
-    # for i in range(len(john_mary)):
-    #     print(journey2.travel_time(i))
-    # # print(journey.travel_time(0))
-    # journey2.print_time_stats()
-    # journey2.recommended_route()
+    print("----------------------------------------")
+    john = Passenger(start=(0,2), end=(8,1), speed=15)
+    mary = Passenger(start=(0,0), end=(6,2), speed=12)  
+    john_mary = [john,mary]
+    journey2 = Journey(route,john_mary)
+    journey2.plot_bus_load()
+    for i in range(len(john_mary)):
+        print(journey2.travel_time(i))
+    # print(journey.travel_time(0))
+    journey2.print_time_stats()
+    for i in range(len(john_mary)):
+        print(journey2.recommended_route_for_passenger(i))
