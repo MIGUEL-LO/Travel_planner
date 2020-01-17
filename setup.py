@@ -11,9 +11,9 @@ setup(
     description="A travel planner package",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    # packages=find_packages('travelplanner'),#exclude=['*test']),
-    packages=find_packages(exclude=['*test']),
-    # package_dir={'':'travelplanner'}
+    packages=find_packages('mphy0021-2019-travel-planner-MIGUEL-LO'),#exclude=['*test']),
+    # packages=find_packages(exclude=['*test']),
+    package_dir={'':'mphy0021-2019-travel-planner-MIGUEL-LO'}
     install_requires=['numpy','pandas','pytest','matplotlib'],
     entry_points={
         'console_scripts': [
