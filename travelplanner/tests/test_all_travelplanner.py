@@ -1,6 +1,10 @@
 from travelplanner.all_classes_travelplanner import Journey, read_passengers, Route , Passenger
 import pytest
 import numpy as np
+from pathlib import Path
+
+TEST_DIR = Path(__file__).parent
+
 
 class Test_passenger_class:
 
@@ -50,7 +54,7 @@ class Test_route_class:
         ]
     )
     def test_read_route(self,route,expectation):
-        self.route = Route(route)
+        self.route = Route(TEST_DIR / route)
         assert self.route.read_route() == expectation   
 
 
@@ -79,7 +83,7 @@ class Test_route_class:
 
     # need to somehow paramatrie these ones
     def test_timetable(self):
-        route = Route("route.csv")
+        route = Route(TEST_DIR / "route.csv")
         assert route.timetable() == {'A': 0, 'B': 70, 'C': 80, 'D': 130, 'E': 160, 'F': 220, 'G': 260}
 
     @pytest.mark.parametrize(
@@ -90,7 +94,7 @@ class Test_route_class:
             ]
     )
     def test_route_cc(self,route,expectation):
-        route = Route(route)
+        route = Route(TEST_DIR /  route)
         assert route.route_cc() == expectation
 
     @pytest.mark.parametrize(
@@ -98,13 +102,13 @@ class Test_route_class:
             ("testroute.csv",0),
             ("testroute2.csv",0),
             ("testroute3.csv",0),
-            ([(9, 7, 'A'), (10, 8, 0), (9, 9, 0), (9, 10, 'B')],1),
-            ([(9, 7, 'A'), (9, 8, 0), (10, 9, 0), (9, 10, 1)],1),
-            ([(9, 7, 'A'), (9, 8, 0), (9, 9, 0), (10, 10, 'B')],1)
+            ("testroute4.csv",1),
+            ("testroute5.csv",1),
+            ("testroute6.csv",1)
             ]
     )
     def test_check_error(self, route, expectation):
-        route = Route(route)
+        route = Route(TEST_DIR / route)
         assert route.check_error() == expectation
 
 
@@ -118,7 +122,7 @@ class Test_route_class:
     ]
 )
 def test_read_route(passenger,expected):
-    passengers = read_passengers(passenger)
+    passengers = read_passengers(TEST_DIR / passenger)
     assert passengers == expected
 
 class Test_journey_class:
@@ -132,8 +136,8 @@ class Test_journey_class:
     )
     def test_passenger_trip(self,passenger):
         with pytest.raises(Exception):
-            route = Route("route.csv")
-            passengers = read_passengers("passenger.csv")
+            route = Route(TEST_DIR / "route.csv")
+            passengers = read_passengers(TEST_DIR / "passenger.csv")
             passengers_list = [Passenger(start,end,speed) for start, end, speed in passengers]
             journey = Journey(route,passengers_list) 
             journey.passenger_trip(passenger)
@@ -146,8 +150,8 @@ class Test_journey_class:
         ]
     )
     def test_passenger_get_on_off_bus_stop_name(self,passenger, expected):
-        route = Route("route.csv")
-        passengers = read_passengers("passenger.csv")
+        route = Route(TEST_DIR / "route.csv")
+        passengers = read_passengers(TEST_DIR / "passenger.csv")
         passengers_list = [Passenger(start,end,speed) for start, end, speed in passengers]
         journey = Journey(route,passengers_list) 
         get_on_bus = journey.passenger_trip_time(passenger)[2]
@@ -162,8 +166,8 @@ class Test_journey_class:
         ]
     )
     def test_passenger_walk_distance_to_from_bus_stop(self,passenger, expected):
-        route = Route("route.csv")
-        passengers = read_passengers("passenger.csv") 
+        route = Route(TEST_DIR / "route.csv")
+        passengers = read_passengers(TEST_DIR / "passenger.csv") 
         passengers_list = [Passenger(start,end,speed) for start, end, speed in passengers]
         journey = Journey(route,passengers_list)    
         assert journey.passenger_walk_distance_to_from_bus_stop(passenger) == expected
@@ -176,8 +180,8 @@ class Test_journey_class:
         ]
     )
     def test_passenger_journey_allowed(self,passenger, expected):
-        route = Route("route.csv")
-        passengers = read_passengers("passenger.csv") 
+        route = Route(TEST_DIR / "route.csv")
+        passengers = read_passengers(TEST_DIR / "passenger.csv") 
         passengers_list = [Passenger(start,end,speed) for start, end, speed in passengers]
         journey = Journey(route,passengers_list)
         # passenger = ((0, 1), (3, 9), 16)
@@ -192,8 +196,8 @@ class Test_journey_class:
         ]
     )
     def test_plot_bus_load(self,route, passengers, expected):
-        route = Route(route)
-        passengers = read_passengers(passengers) 
+        route = Route(TEST_DIR / route)
+        passengers = read_passengers(TEST_DIR / passengers) 
         passengers_list = [Passenger(start,end,speed) for start, end, speed in passengers]
         journey = Journey(route,passengers_list)
         bus_plot_load = journey.plot_bus_load(isTesting=1)
@@ -207,8 +211,8 @@ class Test_journey_class:
         ]
     )
     def test_passenger_trip_time(self,passenger, expected):
-        route = Route("route.csv")
-        passengers = read_passengers("passenger.csv") 
+        route = Route(TEST_DIR / "route.csv")
+        passengers = read_passengers(TEST_DIR / "passenger.csv") 
         passengers_list = [Passenger(start,end,speed) for start, end, speed in passengers]    
         journey = Journey(route,passengers_list)
         passenger_trip_time = journey.passenger_trip_time(passenger)
@@ -222,8 +226,8 @@ class Test_journey_class:
         ]
     )
     def test_travel_time(self,id, expected):
-        route = Route("route.csv")
-        passengers = read_passengers("passenger.csv") 
+        route = Route(TEST_DIR / "route.csv")
+        passengers = read_passengers(TEST_DIR / "passenger.csv") 
         passengers_list = [Passenger(start,end,speed) for start, end, speed in passengers]    
         journey = Journey(route,passengers_list)
         travel_time = journey.travel_time(id)
@@ -237,8 +241,8 @@ class Test_journey_class:
         ]
     )
     def test_print_time_stats(self,route, passengers, expected):
-        route = Route(route)
-        passengers = read_passengers(passengers) 
+        route = Route(TEST_DIR / route)
+        passengers = read_passengers(TEST_DIR /passengers) 
         passengers_list = [Passenger(start,end,speed) for start, end, speed in passengers]    
         journey = Journey(route,passengers_list)
         assert journey.print_time_stats() == print(expected)
@@ -252,8 +256,8 @@ class Test_journey_class:
         ]
     )
     def test_recommended_route_for_passenger(self,id, expected):
-        route = Route("route.csv")
-        passengers = read_passengers("passenger.csv") 
+        route = Route(TEST_DIR /"route.csv")
+        passengers = read_passengers(TEST_DIR /"passenger.csv") 
         passengers_list = [Passenger(start,end,speed) for start, end, speed in passengers]    
         journey = Journey(route,passengers_list)    
         recommended_route_for_passenger = journey.recommended_route_for_passenger(id)
