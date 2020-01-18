@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="travelplanner", # Replace with your own username
-    version="0.0.4",
+    version="0.0.5",
     author="Miguel Lopez",
     author_email="miguel.birbuet.19@ucl.ac.uk",
     description="A travel planner package",
