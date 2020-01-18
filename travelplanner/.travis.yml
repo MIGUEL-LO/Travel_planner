@@ -13,7 +13,7 @@ python:
   # - "3.8"
 # command to install dependencies
 before_install:
-  - cd mphy0021-2019-travel-planner-MIGUEL-LO\travelplanner\tests
+  - cd mphy0021-2019-travel-planner-MIGUEL-LO/travelplanner/tests
 install:
   # install dependencies for testing
   - pip install pytest pytest-cov
