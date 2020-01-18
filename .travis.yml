@@ -1,8 +1,24 @@
+# language: python
+# python:
+#   - "3.7"
+# # command to install dependencies
+# install:
+#   - pip install -r requirements.txt
+# script:
+#   # - cd travelplanner  
+#   - pytest 
 language: python
 python:
   - "3.7"
+  # - "3.8"
 # command to install dependencies
+# before_install:
+#   - cd mphy0021-2019-travel-planner-MIGUEL-LO/travelplanner/tests
 install:
-  - pip install -r requirements.txt
+  # install dependencies for testing
+  - pip install pytest pytest-cov
+  # install the package
+  - pip install .
+# command to run tests
 script:
-- pytest 
+  - pytest --cov=./

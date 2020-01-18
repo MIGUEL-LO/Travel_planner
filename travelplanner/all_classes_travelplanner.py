@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 from string import ascii_uppercase
-
+import operator
 ###################################
 ###################################
 ###################################
@@ -54,8 +54,9 @@ class Passenger:
 ###################################
 
 class Route:
-    def __init__(self, route):
+    def __init__(self, route, bus_speed=10):
         self.route = route
+        self.bus_speed = bus_speed
     
     
     def read_route(self):
@@ -76,7 +77,7 @@ class Route:
             return data_out    
     
     
-    def plot_map(self):
+    def plot_map(self,save_plot=None):
 
         route = self.read_route()
 
@@ -101,18 +102,19 @@ class Route:
             if stop:
                 grid[y, x] += 1
 
-        fig, ax = plt.subplots(1, 1)
+        fig, ax = plt.subplots(1, 1, figsize=(8, 6))
         ax.pcolor(grid)
         ax.invert_yaxis()
         ax.set_aspect('equal', 'datalim')
-        plt.show()
-        
+        if save_plot:
+            plt.savefig("map.png")
+        # else:
+            # plt.show()
 
     # stops is a dictionary holding the bus stop name and time of arrival. 
     # starting from 0 at stop A and taking 10 mins to reach checkpoints in  
     # the travel of bus
-    def timetable(self,bus_speed=10):
-        self.bus_speed = bus_speed
+    def timetable(self):
         '''
         Generates a timetable for a route as minutes from its first stop.
         With a user defined bus_speed otherwise default bus_speed = 10
@@ -131,7 +133,7 @@ class Route:
         for step in route:
             if step[2]:
                 stops[step[2]] = time
-            time += bus_speed
+            time += self.bus_speed
             
         return stops
     
@@ -220,7 +222,8 @@ class Journey(Route, Passenger):
         self.passengers = passengers
         self.bus_travel_time_dict = {}
         
-    def passenger_trip(self, passenger):
+
+    def passenger_trip(self,passenger):
         ''' 
         Returns the distance to the nearest bus stop to starting and ending location.
         '''
@@ -247,18 +250,29 @@ class Journey(Route, Passenger):
             # unpacked stops into x, y, stop. 
             stops = [value for value in self.route.read_route() \
                                                         if value[2]]
-    
-        # The distance to the closest bus stop for a passenger
-        # from their start location.
+
+        def locate_min_distance(touple_dis_stop):
+            my_dis = []
+            my_stop = []
+            for dis, stop in touple_dis_stop:
+                my_dis.append(dis)
+                my_stop.append(stop)
+            smallest = min(my_dis)
+
+            smallest_id = [index for index, element in enumerate(my_dis) 
+                              if smallest == element]
+
+            return smallest, [my_stop[i] for i in smallest_id]            
+
         start_dist = [(math.sqrt((x - start[0])**2 +
-                    (y - start[1])**2), stop) for x,y,stop in stops]
-        closer_start = min(start_dist)
+                    (y - start[1])**2),stop) for x,y,stop in stops]
+        closer_start_points = locate_min_distance(start_dist)
         # to end
         end_dist = [(math.sqrt((x - end[0])**2 +
-                    (y - end[1])**2), stop) for x,y,stop in stops]
-        closer_end = min(end_dist)
-        
-        return(closer_start, closer_end)
+                    (y - end[1])**2),stop) for x,y,stop in stops]
+        closer_end_points = locate_min_distance(end_dist)
+        # returns a 3d vector
+        return(closer_start_points, closer_end_points)
 
     
     def passenger_get_on_off_bus_stop_name(self, passenger):
@@ -285,6 +299,56 @@ class Journey(Route, Passenger):
         return(walk_distance_get_on_bus_stop, walk_distance_get_off_bus_stop)
 
 
+    def passenger_trip_time(self,passenger):
+        '''
+        Finds the duration of the journey for the passenger onn the bus and walking.
+        '''        
+        pace = passenger[2]
+
+        # Name of the bus stop they will need to get on and off.
+        bus_stop_name = self.passenger_get_on_off_bus_stop_name(passenger)
+        possible_get_on_bus_stop = bus_stop_name[0]
+        possible_get_off_bus_stop = bus_stop_name[1]
+
+        # Distance walked by the passenger to the bus stop and to the final location.
+        walk_to_from_bus_stop = self.passenger_walk_distance_to_from_bus_stop(passenger)
+        walk_distance_get_on_bus_stop = walk_to_from_bus_stop[0]
+        walk_distance_get_off_bus_stop = walk_to_from_bus_stop[1]
+
+        def time_and_bus_stop(get_on_or_off_bus_stop):
+            bus_times = self.route.timetable()
+            bus_time_and_stop = []
+            # making a 2D array containing a touple, where the first value in touple holds
+            # the time arrival of the bus at second value of the touple bus stop,
+            # at which the passenger either gets on or off
+            for stop in get_on_or_off_bus_stop:
+                bus_time_and_stop.append([bus_times[stop],stop])
+            return bus_time_and_stop
+
+        # Minimising the time the passenger travels for by not adding unecessary bus stops to their journey    
+        # Finding the nearest and earliest bus stop to the passengers final destination
+        min_time_get_off_bus_stop = min(time_and_bus_stop(possible_get_off_bus_stop),key=operator.itemgetter(0))
+        # Finding the nearest and latest bus stop to the passengers starting destinatio
+        max_time_get_on_bus_stop = max(time_and_bus_stop(possible_get_on_bus_stop),key=operator.itemgetter(0))
+
+        min_trav_time_get_off_bus_stop_time = min_time_get_off_bus_stop[0]
+        min_trav_time_get_on_bus_stop_time = max_time_get_on_bus_stop[0]
+
+        # How long the passenger travelled for in the bus, by chossing best bus route option
+        bus_travel = min_trav_time_get_off_bus_stop_time - min_trav_time_get_on_bus_stop_time
+
+        # Finding out how long the passenger walked for to get to the bus stop
+        # and to get to their final destination from the bus stop they got off.
+        min_trav_time_get_on_bus_stop_name = max_time_get_on_bus_stop[1]
+        min_trav_time_get_off_bus_stop_name = min_time_get_off_bus_stop[1]
+
+        walk_travel = walk_distance_get_on_bus_stop * pace + \
+                      walk_distance_get_off_bus_stop * pace
+
+
+        return bus_travel, walk_travel, min_trav_time_get_on_bus_stop_name, \
+                min_trav_time_get_off_bus_stop_name , walk_distance_get_on_bus_stop, walk_distance_get_off_bus_stop
+
     def passenger_journey_allowed(self,passenger):
         '''
         Checks wether the passenger journey travels in the same direction as the bus route
@@ -299,12 +363,11 @@ class Journey(Route, Passenger):
 
         number_lett_dict = dict(('{}'.format(letter), number) for number, letter in enumerate(ascii_uppercase, 1))
 
-        bus_stop_name = self.passenger_get_on_off_bus_stop_name(passenger)
-        get_on_bus_stop = bus_stop_name[0]
-        get_off_bus_stop = bus_stop_name[1]
+        get_on_bus_stop_name = self.passenger_trip_time(passenger)[2]
+        get_off_bus_stop_name = self.passenger_trip_time(passenger)[3]
 
-        value_get_on_bus_stop = number_lett_dict[get_on_bus_stop]
-        value_get_off_bus_stop = number_lett_dict[get_off_bus_stop]
+        value_get_on_bus_stop = number_lett_dict[get_on_bus_stop_name]
+        value_get_off_bus_stop = number_lett_dict[get_off_bus_stop_name]
 
         if value_get_on_bus_stop > value_get_off_bus_stop:
             # person taking the bus on the oposite direction to the bus route
@@ -317,26 +380,23 @@ class Journey(Route, Passenger):
             return 3   
         
         
-    def plot_bus_load(self,isTesting=None): 
+    def plot_bus_load(self,save_plot=None,isTesting=None): 
         '''
         Shows the amount of people on the bus during the bus journey.
         '''
         self.stops = {step[2]:0 for step in self.route.read_route()
                                                          if step[2]}
         for passenger in self.passengers:
-            bus_stop_name = self.passenger_get_on_off_bus_stop_name(passenger.return_values())
-            # passenger gets on at bus stop
-            get_on_bus_stop = bus_stop_name[0]
-            # passenger gets off at bus stop
-            get_off_bus_stop = bus_stop_name[1]
-
+            get_on_bus_stop_name = self.passenger_trip_time(passenger.return_values())[2]
+            get_off_bus_stop_name = self.passenger_trip_time(passenger.return_values())[3]
+            
             # check to see if journey is allowed
             check_journey_allowed = self.passenger_journey_allowed(passenger.return_values())
             if check_journey_allowed == 3: 
                 # ie. person getting on at bus stop 'A'.
-                self.stops[get_on_bus_stop] += 1
+                self.stops[get_on_bus_stop_name] += 1
                 # person leaving bus stop at 'C'.
-                self.stops[get_off_bus_stop] -= 1
+                self.stops[get_off_bus_stop_name] -= 1
 
         if isTesting:
             return self.stops
@@ -349,39 +409,13 @@ class Journey(Route, Passenger):
             ax.step(range(len(self.stops)), list(self.stops.values()), where='post')
             ax.set_xticks(range(len(self.stops)))
             ax.set_xticklabels(list(self.stops.keys()))
-            plt.show()
-        # return self.stops
-        
-    def passenger_trip_time(self,passenger):
-        '''
-        Finds the duration of the journey for the passenger onn the bus and walking.
-        '''        
-        pace = passenger[2]
-        
-        # Name of the bus stop they will need to get on and off.
-        bus_stop_name = self.passenger_get_on_off_bus_stop_name(passenger)
-        get_on_bus_stop = bus_stop_name[0]
-        get_off_bus_stop = bus_stop_name[1]
+            if save_plot:
+                plt.savefig("load.png")
+            # else:
+            #     plt.show()
 
-        # Distance walked by the passenger to the bus stop and to the final location.
-        walk_to_from_bus_stop = self.passenger_walk_distance_to_from_bus_stop(passenger)
-        walk_distance_get_on_bus_stop = walk_to_from_bus_stop[0]
-        walk_distance_get_off_bus_stop = walk_to_from_bus_stop[1]
         
-        # The bus route timetable.
-        bus_times = self.route.timetable()
-        
-        # Calculating the length of the bus ride.
-        bus_travel = bus_times[get_off_bus_stop] - \
-                     bus_times[get_on_bus_stop]
-        
-        # Finding out how long the passenger walked for to get to the bus stop
-        # and to get to their final destination from the bus stop they got off.
-        walk_travel = walk_distance_get_on_bus_stop * pace + \
-                      walk_distance_get_off_bus_stop * pace
-        
-        return(bus_travel, walk_travel, bus_stop_name, walk_to_from_bus_stop)
-
+    
 
     def travel_time(self, passenger_id):
         '''This returns a dictioanry containing how long the passenger was on the bus and how long they walked for'''
@@ -451,15 +485,12 @@ class Journey(Route, Passenger):
                             f"The total time of travel if you walked is: {walking_time:03.2f} minutes.")        
 
                 else:
-                    # The passenger can use the bus to travel
-                    bus_travel, walk_travel, bus_stop_name, walk_to_from_bus_stop = self.passenger_trip_time(passenger.return_values())
                     # Name of the bus stop they will need to get on and off.
-                    get_on_bus_stop = bus_stop_name[0]
-                    get_off_bus_stop = bus_stop_name[1]
                     # Distance walked by the passenger to get on the bus and distace the passenger
                     # walked from the bus they got off to their final destination.
-                    walk_distance_get_on_bus_stop = walk_to_from_bus_stop[0]
-                    walk_distance_get_off_bus_stop = walk_to_from_bus_stop[1]
+                    # The passenger can use the bus to travel
+                    bus_travel, walk_travel, get_on_bus_stop,get_off_bus_stop, walk_distance_get_on_bus_stop, walk_distance_get_off_bus_stop  = self.passenger_trip_time(passenger.return_values())
+
                     total_time = bus_travel + walk_travel
                         
                     if walking_time > total_time:
@@ -501,28 +532,29 @@ class Journey(Route, Passenger):
                             f"Total time of travel: {total_time:03.2f} minutes.")
 
 
-if __name__ == "__main__":
-    route = Route("route.csv")
-    passengers = read_passengers("passenger.csv")
-    passengers_list = [Passenger(start,end,speed) for start, end, speed in passengers]
-    journey = Journey(route,passengers_list)
-    print(journey.plot_bus_load())
-    for i in range(len(passengers_list)):
-        print(journey.travel_time(i))
-    journey.print_time_stats()
-    for i in range(len(passengers_list)):
-        print(journey.recommended_route_for_passenger(i))
-    route.plot_map()
+# if __name__ == "__main__":
+# from travelplanner import Passenger, Route, Journey, read_passengers
+# route = Route("route.csv")
+# passengers = read_passengers("passenger.csv")
+# passengers_list = [Passenger(start,end,speed) for start, end, speed in passengers]
+# journey = Journey(route,passengers_list)
+# journey.plot_bus_load()
+# for i in range(len(passengers_list)):
+#     print(journey.travel_time(i))
+# journey.print_time_stats()
+# for i in range(len(passengers_list)):
+#     print(journey.recommended_route_for_passenger(i))
+# route.plot_map()
 
-    print("----------------------------------------")
-    john = Passenger(start=(0,2), end=(8,1), speed=15)
-    mary = Passenger(start=(0,0), end=(6,2), speed=12)  
-    john_mary = [john,mary]
-    journey2 = Journey(route,john_mary)
-    journey2.plot_bus_load()
-    for i in range(len(john_mary)):
-        print(journey2.travel_time(i))
-    # print(journey.travel_time(0))
-    journey2.print_time_stats()
-    for i in range(len(john_mary)):
-        print(journey2.recommended_route_for_passenger(i))
+#     print("----------------------------------------")
+    # john = Passenger(start=(0,2), end=(8,1), speed=15)
+    # mary = Passenger(start=(0,0), end=(6,2), speed=12)  
+    # john_mary = [john,mary]
+    # journey2 = Journey(route,john_mary)
+    # journey2.plot_bus_load()
+    # for i in range(len(john_mary)):
+    #     print(journey2.travel_time(i))
+    # # print(journey.travel_time(0))
+    # journey2.print_time_stats()
+    # for i in range(len(john_mary)):
+    #     print(journey2.recommended_route_for_passenger(i))
