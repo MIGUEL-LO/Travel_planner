@@ -250,9 +250,9 @@ class Test_journey_class:
 
     @pytest.mark.parametrize(
         'id, expected', [
-            (0,"Trip for passenger: 0\nThe bus route does not suit your journey.\nIt will be better if you walked.\nThe total time of travel if you walked is: 24.60 minutes."),
-            (1,"Trip for passenger: 1\nThe bus route does not suit your journey.\nIt will be better if you walked.\nThe total time of travel if you walked is: 31.30 minutes."),
-            (2,"Trip for passenger: 2\nThe bus does not travel in the direction of your destination.\nIt will be better if you walked.\nThe total time of the journey if you walked is: 136.70 minutes.")
+            (0,"Trip for passenger: 0\nThe bus route does not suit your journey.\nIt will be better if you walked.\nThe total time of travel if you walked is:24.60 minutes."),
+            (1,"Trip for passenger: 1\nThe bus route does not suit your journey.\nIt will be better if you walked.\nThe total time of travel if you walked is:31.30 minutes."),
+            (2,"Trip for passenger: 2\nThe bus does not travel in the direction,of your destination.\nIt will be better if you walked.\nThe total time of the journey if you walked is:136.70 minutes.")
         ]
     )
     def test_recommended_route_for_passenger(self,id, expected):
