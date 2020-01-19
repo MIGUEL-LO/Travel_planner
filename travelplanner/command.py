@@ -9,14 +9,14 @@ def process():
                             "passenger."),
                             formatter_class=ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument('route_file', default="route.csv",
+    parser.add_argument('routefile',
                         help="Input CSV file with the route of the bus.")
 
-    parser.add_argument('passengers_file', default="passenger.csv",
+    parser.add_argument('passfile',
                         help=("Input CSV file with the passengers journey"
                               "details."))
 
-    parser.add_argument('--bus_speed', '-s', type=int, default=10,
+    parser.add_argument('--speed', '-s', type=int, default=10,
                         help="Speed of the bus.")
 
     parser.add_argument('--saveplots', '-sps', default=None,
@@ -24,12 +24,15 @@ def process():
                         help="Saving the plots of bus load.")
 
     arguments = parser.parse_args()
-    route = Route(route=arguments.route_file, bus_speed=arguments.bus_speed)
-    passengers = read_passengers(arguments.passengers_file)
+    route = Route(route=arguments.routefile, bus_speed=arguments.speed)
+    passengers = read_passengers(arguments.passfile)
     timetable = route.timetable()
     passengers_ls = passengers_list(passengers)
     journey = Journey(route, passengers_ls)
     save_bus_map = route.plot_map(save_plot=arguments.saveplots)
     save_bus_load = journey.plot_bus_load(save_plot=arguments.saveplots)
+    print(timetable)
+    for i in range(len(passengers_ls)):
+        print(journey.recommended_route_for_passenger(i))
 
     return 0
