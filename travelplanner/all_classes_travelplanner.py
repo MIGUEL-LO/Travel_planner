@@ -4,11 +4,6 @@ import matplotlib.pyplot as plt
 import math
 from string import ascii_uppercase as aci
 from operator import itemgetter
-###################################
-###################################
-###################################
-###################################
-###################################
 
 
 class Passenger:
@@ -40,11 +35,18 @@ class Passenger:
         '''
         self.time = np.sqrt((self.x2-self.x1)**2
                             + (self.y2-self.y1)**2) * self.speed
-        
+
         return self.time
 
     def return_values(self):
         return((self.x1, self.y1), (self.x2, self.y2), self.speed)
+
+
+def passengers_list(passengers):
+    my_pass_list = []
+    for start, end, speed in passengers:
+        my_pass_list.append(Passenger(start, end, speed))
+    return my_pass_list
 
 
 class Route:
@@ -68,7 +70,7 @@ class Route:
             data_out = [(df.iloc[i]['x1, y1, stop']) for i in range(len(df))]
 
             return data_out
-    
+
     def plot_map(self, save_plot=None):
 
         route = self.read_route()
@@ -86,7 +88,7 @@ class Route:
                 raise Exception('The bus journey bus stop should not be a'
                                 'number but a letter.'
                                 'The value of x was: {}'.format(stop))
-                            
+
         max_x = max([n[0] for n in route]) + 5  # adds padding
         max_y = max([n[1] for n in route]) + 5
         grid = np.zeros((max_y, max_x))
@@ -135,11 +137,6 @@ class Route:
     def route_cc(self):
         '''
         Converts a set of route into a Freeman chain code
-        3 2 1
-        \ | /
-        4 - C - 0
-        / | \
-        5 6 7
         '''
         # starting cord of bus route
         # Choosing bus stop A and giving (x,y) cord for it
@@ -163,7 +160,7 @@ class Route:
             cc.append(int(freeman_coord2cc[(x_step, y_step)]))
 
         return cc
-    
+
     def check_error(self):
         '''
         The bus is not allowed to move diagonally. This function checks wether
@@ -183,13 +180,6 @@ class Route:
             return 1
         else:
             return 0
-
-
-###################################
-###################################
-###################################
-###################################
-###################################
 
 
 def read_passengers(file_name):
@@ -212,7 +202,7 @@ class Journey(Route, Passenger):
         self.route = route
         self.passengers = passengers
         self.bus_trav_time_dic = {}
-        
+
     def passenger_trip(self, passenger):
         '''
         Returns the distance to the nearest bus stop to starting
@@ -270,10 +260,10 @@ class Journey(Route, Passenger):
                     dis = math.sqrt((x - end[0])**2 + (y - end[1])**2)
                 my_dist.append([dis, stop])
             return my_dist
-                
+
         start_dist = distance(0, start, end, stops)
         closer_start_points = locate_min_distance(start_dist)
-        
+
         end_dist = distance(1, start, end, stops)
         closer_end_points = locate_min_distance(end_dist)
 
@@ -301,7 +291,7 @@ class Journey(Route, Passenger):
 
         return(walk_distance_get_on_bus_stop, walk_distance_get_off_bus_stop)
 
-    def passenger_trip_time(self, passenger):
+    def passenger_trip_time(self, passenger, isTesting=None):
         '''
         Finds the duration of the journey for the passenger onn the bus
         and walking.
@@ -353,8 +343,17 @@ class Journey(Route, Passenger):
         min_time_off = get_off_bus_stop[1]
 
         walktime = walk_on * pace + walk_off * pace
-
-        return bustime, walktime, min_time_on, min_time_off, walk_on, walk_off
+        vals = bustime, walktime, min_time_on, min_time_off, walk_on, walk_off
+        if isTesting:
+            my_vals = []
+            for item in vals:
+                if type(item) != str:
+                    my_vals.append(round(item, 2))
+                else:
+                    my_vals.append(item)
+            return my_vals
+        else:
+            return vals
 
     def passenger_journey_allowed(self, passenger):
         '''
@@ -385,7 +384,7 @@ class Journey(Route, Passenger):
         else:
             # person getting on and off bus stop, following the bus route
             return 3
-        
+
     def plot_bus_load(self, save_plot=None, isTesting=None):
         '''
         Shows the amount of people on the bus during the bus journey.
@@ -439,9 +438,9 @@ class Journey(Route, Passenger):
             else:
                 pass_walk = passenger.walk_time()
                 self.bus_trav_time_dic[pass_id] = {'bus': 0, 'walk': pass_walk}
-                
+
         return self.bus_trav_time_dic[passenger_id]
-    
+
     def print_time_stats(self):
         '''
         Prints the average time passengers spent on the bus and walking
@@ -456,10 +455,10 @@ class Journey(Route, Passenger):
 
         average_bus_time = sum_bus_time/(i+1.0)
         average_walk_time = sum_walk_time/(i+1.0)
-        
+
         print((f"Average time on the bus: {average_bus_time:3.2f} minutes. \n"
               f"Average time walking: {average_walk_time:3.2f} minutes."))
-    
+
     def recommended_route_for_passenger(self, id):
         '''
         Advices the passengers on what would be the best travelling option
@@ -509,11 +508,11 @@ class Journey(Route, Passenger):
                     min_time_on, min_time_off = pass_trip[2], pass_trip[3]
                     walk_on, walk_off = pass_trip[4], pass_trip[5]
                     total_time = bustime + walktime
-                        
+
                     if walking_time > total_time:
                         # Print journey option when,
                         # walking takes longer than the bus ride
-                        
+
                         return (f"Trip for passenger: {passenger_id}\n"
                                 "It is advised that you take the bus"
                                 "as walking will take:"
@@ -546,7 +545,7 @@ class Journey(Route, Passenger):
                                 f"{min_time_off} and \n"
                                 f"walk:{walk_off:3.2f} units to destination.\n"
                                 "Total time of travel:"
-                                f"{total_time:03.2f} minutes.")                                
+                                f"{total_time:03.2f} minutes.")
 
                     else:
                         # Print journey option when taking the bus,
@@ -588,7 +587,7 @@ class Journey(Route, Passenger):
 
 #     print("----------------------------------------")
     # john = Passenger(start=(0,2), end=(8,1), speed=15)
-    # mary = Passenger(start=(0,0), end=(6,2), speed=12)  
+    # mary = Passenger(start=(0,0), end=(6,2), speed=12)
     # john_mary = [john,mary]
     # journey2 = Journey(route,john_mary)
     # journey2.plot_bus_load()
