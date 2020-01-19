@@ -73,7 +73,7 @@ class Route:
 
     def plot_map(self, save_plot=None):
 
-        route = self.read_route()
+        route = self.return_route()
 
         for x, y, stop in route:
             if type(x) == str:
@@ -125,7 +125,7 @@ class Route:
         # the travel of bus.
         # can potentially change the speed
 
-        route = self.read_route()
+        route = self.return_route()
         time = 0
         stops = {}
         for step in route:
@@ -180,6 +180,14 @@ class Route:
             return 1
         else:
             return 0
+    
+    def return_route(self):
+        if self.check_error() == 0:
+            route = self.read_route()
+            return route
+        else:
+            raise Exception('The bus route contains a diagonal movement')
+
 
 
 def read_passengers(file_name):
@@ -232,7 +240,7 @@ class Journey(Route, Passenger):
             # Stops holds the cordinates for a bus stop in the bus route
             # journey.
             # unpacked stops into x, y, stop.
-            stops = [value for value in self.route.read_route() if value[2]]
+            stops = [value for value in self.route.return_route() if value[2]]
 
         def locate_min_distance(touple_dis_stop):
             my_dis = []
@@ -391,7 +399,7 @@ class Journey(Route, Passenger):
         '''
 #         stops = self.stops
         route = self.route
-        stops = {step[2]: 0 for step in route.read_route() if step[2]}
+        stops = {step[2]: 0 for step in route.return_route() if step[2]}
         for passenger in self.passengers:
             pass_val = passenger.return_values()
             get_on_bus_stop_name = self.passenger_trip_time(pass_val)[2]
@@ -569,21 +577,21 @@ class Journey(Route, Passenger):
                                 f"{total_time:03.2f} minutes.")
 
 
-# if __name__ == "__main__":
+if __name__ == "__main__":
 # from travelplanner import Passenger, Route, Journey, read_passengers
 # from travelplanner import "passenger.csv", "route.csv"
-# route = Route("route.csv")
-# passengers = read_passengers("passenger.csv")
-# passengers_list = [Passenger(start,end,speed) for start, end, speed in
-# passengers]
-# journey = Journey(route,passengers_list)
-# journey.plot_bus_load()
-# for i in range(len(passengers_list)):
-#     print(journey.travel_time(i))
-# journey.print_time_stats()
-# for i in range(len(passengers_list)):
-#     print(journey.recommended_route_for_passenger(i))
-# route.plot_map()
+    route = Route("route.csv")
+    passengers = read_passengers("passenger.csv")
+    passengers_list = [Passenger(start,end,speed) for start, end, speed in
+    passengers]
+    journey = Journey(route,passengers_list)
+    journey.plot_bus_load()
+    for i in range(len(passengers_list)):
+        print(journey.travel_time(i))
+    journey.print_time_stats()
+    for i in range(len(passengers_list)):
+        print(journey.recommended_route_for_passenger(i))
+    route.plot_map()
 
 #     print("----------------------------------------")
     # john = Passenger(start=(0,2), end=(8,1), speed=15)

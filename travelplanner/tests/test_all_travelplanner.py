@@ -111,7 +111,18 @@ class Test_route_class:
         route = Route(TEST_DIR / route)
         assert route.check_error() == expectation
 
-
+    @pytest.mark.parametrize(
+        'route', [
+            ("testroute4.csv"),
+            ("testroute5.csv"),
+            ("testroute6.csv"), 
+            ]
+    )
+    def test_return_route(self,route):
+        with pytest.raises(Exception):
+            bus_route = Route(TEST_DIR / route)
+            bus_route.return_route()
+    
 @pytest.mark.parametrize(
     'passenger, expected', [
         ("tp1.csv", [((6, 11), (18, 0), 9), ((1, 1), (3, 0), 22)]),
@@ -122,7 +133,6 @@ class Test_route_class:
 def test_read_route(passenger, expected):
     passengers = read_passengers(TEST_DIR / passenger)
     assert passengers == expected
-
 
 class Test_journey_class:
 
