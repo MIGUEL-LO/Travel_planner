@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="travelplanner",
-    version="0.0.5",
+    version="0.0.6",
     author="Miguel Lopez",
     author_email="miguel.birbuet.19@ucl.ac.uk",
     description="A travel planner package",

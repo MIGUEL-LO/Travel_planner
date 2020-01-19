@@ -180,14 +180,13 @@ class Route:
             return 1
         else:
             return 0
-    
+
     def return_route(self):
         if self.check_error() == 0:
             route = self.read_route()
             return route
         else:
             raise Exception('The bus route contains a diagonal movement')
-
 
 
 def read_passengers(file_name):
@@ -577,23 +576,23 @@ class Journey(Route, Passenger):
                                 f"{total_time:03.2f} minutes.")
 
 
-if __name__ == "__main__":
-# from travelplanner import Passenger, Route, Journey, read_passengers
-# from travelplanner import "passenger.csv", "route.csv"
-    route = Route("route.csv")
-    passengers = read_passengers("passenger.csv")
-    passengers_list = [Passenger(start,end,speed) for start, end, speed in
-    passengers]
-    journey = Journey(route,passengers_list)
-    journey.plot_bus_load()
-    for i in range(len(passengers_list)):
-        print(journey.travel_time(i))
-    journey.print_time_stats()
-    for i in range(len(passengers_list)):
-        print(journey.recommended_route_for_passenger(i))
-    route.plot_map()
+# if __name__ == "__main__":
+    # from travelplanner import Passenger, Route, Journey, read_passengers
+    # from travelplanner import "passenger.csv", "route.csv"
+    # route = Route("route.csv")
+    # passengers = read_passengers("passenger.csv")
+    # passengers_list = [Passenger(start,end,speed) for start, end, speed in
+    # passengers]
+    # journey = Journey(route,passengers_list)
+    # journey.plot_bus_load()
+    # for i in range(len(passengers_list)):
+    #     print(journey.travel_time(i))
+    # journey.print_time_stats()
+    # for i in range(len(passengers_list)):
+    #     print(journey.recommended_route_for_passenger(i))
+    # route.plot_map()
 
-#     print("----------------------------------------")
+    # print("----------------------------------------")
     # john = Passenger(start=(0,2), end=(8,1), speed=15)
     # mary = Passenger(start=(0,0), end=(6,2), speed=12)
     # john_mary = [john,mary]
