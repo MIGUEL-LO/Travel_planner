@@ -211,7 +211,7 @@ class Journey(Route, Passenger):
     def __init__(self, route, passengers):
         self.route = route
         self.passengers = passengers
-        self.bus_travel_time_dict = {}
+        self.bus_trav_time_dic = {}
         
     def passenger_trip(self, passenger):
         '''
@@ -427,19 +427,20 @@ class Journey(Route, Passenger):
         was on the bus and how long they walked for.
         '''
         # Need to add BC to not add times for not allowed journeys
-        # self.bus_travel_time_dict = {}
 
-        for passenger_identification, passenger in enumerate(self.passengers):
+        for pass_id, passenger in enumerate(self.passengers):
             # check to see if journey is allowed
-            check_journey_allowed = self.passenger_journey_allowed(passenger.return_values())
-            if check_journey_allowed == 3: 
-                self.bus_travel_time_dict[passenger_identification] = {'bus':self.passenger_trip_time(passenger.return_values())[0]
-                                                                   ,'walk':self.passenger_trip_time(passenger.return_values())[1]}
+            pass_val = passenger.return_values()
+            check_journey_allowed = self.passenger_journey_allowed(pass_val)
+            if check_journey_allowed == 3:
+                bus = self.passenger_trip_time(pass_val)[0]
+                walk = self.passenger_trip_time(pass_val)[1]
+                self.bus_trav_time_dic[pass_id] = {'bus': bus, 'walk': walk}
             else:
-                self.bus_travel_time_dict[passenger_identification] = {'bus':0
-                                                                   ,'walk':passenger.walk_time()}
+                pass_walk = passenger.walk_time()
+                self.bus_trav_time_dic[pass_id] = {'bus': 0, 'walk': pass_walk}
                 
-        return self.bus_travel_time_dict[passenger_id]
+        return self.bus_trav_time_dic[passenger_id]
     
     def print_time_stats(self):
         '''
@@ -453,7 +454,7 @@ class Journey(Route, Passenger):
             sum_bus_time += self.travel_time(i)['bus']
             sum_walk_time += self.travel_time(i)['walk']
 
-        average_bus_time = sum_bus_time/(i+1.0) 
+        average_bus_time = sum_bus_time/(i+1.0)
         average_walk_time = sum_walk_time/(i+1.0)
         
         print((f"Average time on the bus: {average_bus_time:3.2f} minutes. \n"
@@ -471,8 +472,9 @@ class Journey(Route, Passenger):
         for passenger_id, passenger in enumerate(self.passengers):
             # How long the passenger will need to walk for
             walking_time = passenger.walk_time()
+            pass_val = passenger.return_values()
             # check to see if journey is allowed
-            check_journey_allowed = self.passenger_journey_allowed(passenger.return_values())
+            check_journey_allowed = self.passenger_journey_allowed(pass_val)
             print("\n")
             if passenger_id == self.id:
                 # print(f"Trip for passenger: {passenger_id}")
@@ -492,7 +494,8 @@ class Journey(Route, Passenger):
                     return (f"Trip for passenger: {passenger_id}\n"
                             "The bus route does not suit your journey.\n"
                             "It will be better if you walked.\n"
-                            f"The total time of travel if you walked is: {walking_time:03.2f} minutes.")        
+                            "The total time of travel if you walked is:"
+                            f"{walking_time:03.2f} minutes.")
 
                 else:
                     # Name of the bus stop they will need to get on and off.
@@ -501,50 +504,70 @@ class Journey(Route, Passenger):
                     # walked from the bus they got off,
                     # to their final destination.
                     # The passenger can use the bus to travel
-                    bus_travel, walk_travel, get_on_bus_stop,get_off_bus_stop, walk_distance_get_on_bus_stop, walk_distance_get_off_bus_stop  = self.passenger_trip_time(passenger.return_values())
-
-                    total_time = bus_travel + walk_travel
+                    pass_trip = self.passenger_trip_time(pass_val)
+                    bustime, walktime = pass_trip[0], pass_trip[1]
+                    min_time_on, min_time_off = pass_trip[2], pass_trip[3]
+                    walk_on, walk_off = pass_trip[4], pass_trip[5]
+                    total_time = bustime + walktime
                         
                     if walking_time > total_time:
                         # Print journey option when,
                         # walking takes longer than the bus ride
                         
-                        return(f"Trip for passenger: {passenger_id}\n"
-                            f"It is advised that you take the bus as walking will take : {walking_time:03.2f} minutes.\n "
-                            "If you take the bus, you should take this route:\n"
-                            f"Walk {walk_distance_get_on_bus_stop:3.2f} units to stop {get_on_bus_stop}, \n"
-                            f"get on the bus and aligth at stop {get_off_bus_stop} and \n"
-                            f"walk {walk_distance_get_off_bus_stop:3.2f} units to your destination.\n"
-                            f"Total time of travel: {total_time:03.2f} minutes.")
-                        
+                        return (f"Trip for passenger: {passenger_id}\n"
+                                "It is advised that you take the bus"
+                                "as walking will take:"
+                                f"{walking_time:03.2f} minutes.\n"
+                                "If you take the bus,"
+                                "you should take this route:\n"
+                                f"Walk {walk_on:3.2f} units to stop:"
+                                "{min_time_on}, \n"
+                                f"get on the bus and aligth at stop:"
+                                "{min_time_off} and \n"
+                                f"walk {walk_off:3.2f} units,"
+                                "to your destination.\n"
+                                f"Total time of travel:"
+                                "{total_time:03.2f} minutes.")
 
                     elif round(walking_time, 0) == round(total_time, 0):
                         # Rounds the time to nearest minute to allow,
                         # the passenger to make the better decision
 
-                        return(f"Trip for passenger: {passenger_id}\n"
-                            f"You can either walk or take the bus, both journey methods take : {walking_time:03.2f} minutes. "
-                            f"The total time of travel if you walked is: {walking_time:03.2f} minutes. \n"
-                            "If you take the bus, you should take this route:\n"
-                            f"Walk {walk_distance_get_on_bus_stop:3.2f} units to stop {get_on_bus_stop}, \n"
-                            f"get on the bus and aligth at stop {get_off_bus_stop} and \n"
-                            f"walk {walk_distance_get_off_bus_stop:3.2f} units to your destination.\n"
-                            f"Total time of travel: {total_time:03.2f} minutes.")                                
-
+                        return (f"Trip for passenger: {passenger_id}\n"
+                                "You can either walk or take the bus,"
+                                "both journey methods take:"
+                                f"{walking_time:03.2f} minutes."
+                                "The total time of travel if you walked is:"
+                                f"{walking_time:03.2f} minutes. \n"
+                                "If you take the bus, you should take route:\n"
+                                "Walk {walk_on:3.2f} units to stop:"
+                                f"{min_time_on}, \n"
+                                "get on the bus and aligth at stop:"
+                                f"{min_time_off} and \n"
+                                f"walk:{walk_off:3.2f} units to destination.\n"
+                                "Total time of travel:"
+                                f"{total_time:03.2f} minutes.")                                
 
                     else:
                         # Print journey option when taking the bus,
                         # takes longer than walking
                         diff_in_time = total_time - walking_time
-                        return(f"Trip for passenger: {passenger_id}\n"
-                            f"The total time of travel if you walked is: {walking_time:03.2f} minutes. \n"   
-                            f"Taking the the bus will make your journey: {diff_in_time:03.2f} \n" 
-                            "minutes longer compared to walking, it's up to you if you want to walk or take the bus. \n"
-                            "If you take the bus, you should take this route:\n"
-                            f"Walk {walk_distance_get_on_bus_stop:3.2f} units to stop {get_on_bus_stop}, \n"
-                            f"get on the bus and aligth at stop {get_off_bus_stop} and \n"
-                            f"walk {walk_distance_get_off_bus_stop:3.2f} units to your destination.\n"
-                            f"Total time of travel: {total_time:03.2f} minutes.")
+                        return (f"Trip for passenger: {passenger_id}\n"
+                                "The total time of travel if you walked is:"
+                                f"{walking_time:03.2f} minutes. \n"
+                                "Taking the the bus will make your journey:"
+                                f"{diff_in_time:03.2f} \n"
+                                "minutes longer compared to walking,"
+                                "it's up to you if you want to walk"
+                                "or take the bus.\n"
+                                "If you take the bus, take this route:\n"
+                                f"Walk {walk_on:3.2f} units,"
+                                f"to stop {min_time_on}, \n"
+                                "get on the bus ,and"
+                                f"aligth at stop {min_time_off} and \n"
+                                f"walk {walk_off:3.2f} units to destination.\n"
+                                f"Total time of travel:"
+                                f"{total_time:03.2f} minutes.")
 
 
 # if __name__ == "__main__":
@@ -552,7 +575,8 @@ class Journey(Route, Passenger):
 # from travelplanner import "passenger.csv", "route.csv"
 # route = Route("route.csv")
 # passengers = read_passengers("passenger.csv")
-# passengers_list = [Passenger(start,end,speed) for start, end, speed in passengers]
+# passengers_list = [Passenger(start,end,speed) for start, end, speed in
+# passengers]
 # journey = Journey(route,passengers_list)
 # journey.plot_bus_load()
 # for i in range(len(passengers_list)):

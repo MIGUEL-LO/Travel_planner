@@ -170,7 +170,7 @@ class Test_journey_class:
         passengers = read_passengers(TEST_DIR / "passenger.csv") 
         passengers_list = [Passenger(start,end,speed) for start, end, speed in passengers]
         journey = Journey(route,passengers_list)    
-        assert journey.passenger_walk_distance_to_from_bus_stop(passenger) == expected
+        assert journey.passenger_walk_bus_stop(passenger) == expected
 
     @pytest.mark.parametrize(
         'passenger, expected', [
