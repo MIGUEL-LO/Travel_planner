@@ -11,7 +11,8 @@ setup(
     description="A travel planner package",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    packages=find_packages(exclude=['*test']),
+    packages=['travelplanner'],
+    # find_packages(exclude=['*test']),
     install_requires=['numpy', 'pandas', 'pytest', 'matplotlib'],
     entry_points={
         'console_scripts': [

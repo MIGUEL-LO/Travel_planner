@@ -1,19 +1,20 @@
-language: python
-python:
-  - "3.7"
-# command to install dependencies
-install:
-  - pip install -r requirements.txt
-script:
-  - pytest
 # language: python
 # python:
 #   - "3.7"
+# # command to install dependencies
 # install:
-#   # install dependencies for testing
-#   - pip install pytest pytest-cov
-#   # install the package
-#   - pip install .
-# # command to run tests
+#   - pip install -r requirements.txt
 # script:
-#   - pytest --cov=./
+#   - pytest
+language: python
+python:
+  - "3.7"
+install:
+  # install dependencies for testing
+  - pip install pytest pytest-cov
+  # install the package
+  - pip install .
+# command to run tests
+script:
+  - pytest --cov=./
+  # - pytest-doctest-modules
