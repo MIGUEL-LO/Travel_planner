@@ -6,12 +6,35 @@ from string import ascii_uppercase as aci
 from operator import itemgetter
 
 
+def read_passengers(file_name):
+    '''
+    Reads the passengers csv file and returns a list containing touples with
+    the details of the starting and ending location, and speed for a passenger.
+    '''
+    df = pd.read_csv(file_name, names=['x1', 'y1', 'x2', 'y2', 'speed'])
+    # Make collapsed columns for positional dat
+    df['x1, y1'] = list(zip(df['x1'], df['y1']))
+    df['x2, y2'] = list(zip(df['x2'], df['y2']))
+    # Make output list
+    data_out = [(df.iloc[i]['x1, y1'], df.iloc[i]['x2, y2'],
+                 (df.iloc[i]['speed'])) for i in range(len(df))]
+    return data_out
+
+
 class Passenger:
     def __init__(self, start, end, speed):
         self.x1, self.y1 = start
         self.x2, self.y2 = end
         self.speed = speed
+        '''
 
+        Example
+        -------
+        >>> passengers = read_passengers("easypassenger.csv")
+        >>> passenger = Passenger(passengers)
+        >>> walking_t = passenger.walk_time()
+        180
+        '''
         if type(self.x1) == str:
             raise Exception('x_1 coordinate should not be a letter but a'
                             'number. The value of x_1 was: {}'.format(self.x1))
@@ -187,21 +210,6 @@ class Route:
             return route
         else:
             raise Exception('The bus route contains a diagonal movement')
-
-
-def read_passengers(file_name):
-    '''
-    Reads the passengers csv file and returns a list containing touples with
-    the details of the starting and ending location, and speed for a passenger.
-    '''
-    df = pd.read_csv(file_name, names=['x1', 'y1', 'x2', 'y2', 'speed'])
-    # Make collapsed columns for positional dat
-    df['x1, y1'] = list(zip(df['x1'], df['y1']))
-    df['x2, y2'] = list(zip(df['x2'], df['y2']))
-    # Make output list
-    data_out = [(df.iloc[i]['x1, y1'], df.iloc[i]['x2, y2'],
-                 (df.iloc[i]['speed'])) for i in range(len(df))]
-    return data_out
 
 
 class Journey(Route, Passenger):
@@ -577,6 +585,9 @@ class Journey(Route, Passenger):
 
 
 # if __name__ == "__main__":
+#     import travelplanner.all_classes_travelplanner
+#     travelplanner.all_classes_travelplanner.testmod()
+
     # from travelplanner import Passenger, Route, Journey, read_passengers
     # from travelplanner import "passenger.csv", "route.csv"
     # route = Route("route.csv")
