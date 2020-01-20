@@ -6,7 +6,6 @@ import numpy as np
 from pathlib import Path
 
 
-
 class Test_passenger_class:
 
     @pytest.mark.parametrize(
