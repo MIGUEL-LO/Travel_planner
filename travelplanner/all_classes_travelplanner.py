@@ -76,6 +76,7 @@ class Route:
     def __init__(self, route, bus_speed=10):
         self.route = route
         self.bus_speed = bus_speed
+        self.return_route
 
     def read_route(self):
         '''
