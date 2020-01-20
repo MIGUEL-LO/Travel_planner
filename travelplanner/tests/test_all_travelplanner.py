@@ -4,22 +4,29 @@ from travelplanner.all_classes_travelplanner import (Journey, read_passengers,
 import pytest
 import numpy as np
 from pathlib import Path
+import yaml
+import os
 
 TEST_DIR = Path(__file__).parent
 
 
 class Test_passenger_class:
 
-    @pytest.mark.parametrize(
-        'start, end, speed', [
-            ((1, 2), (3, 4), 5),
-            ((6, 7), (8, 9), 10),
-            ((-11, 12), (13, 14), -15),
-        ]
-    )
-    def test_Passenger_return_values(self, start, end, speed):
-        passenger = Passenger(start, end, speed)
-        assert passenger.return_values() == (start, end, speed)
+    def read_fixture():
+        with open(os.path.join(os.path.dirname(__file__),
+                               'fixture_data.yaml')) as fixtures_file:
+            fixtures = yaml.safe_load(fixtures_file)
+        return fixtures
+
+    @pytest.mark.parametrize("fixture", read_fixture())
+    def test_passenger_return_values(self, fixture):
+        start = fixture.pop('start')
+        end = fixture.pop('end')
+        speed = fixture.pop('speed')
+        start_toup = tuple(map(int, start.split(' ')))
+        end_toup = tuple(map(int, end.split(' ')))
+        passenger = Passenger(start_toup, end_toup, speed)
+        assert passenger.return_values() == (start_toup, end_toup, speed)
 
     @pytest.mark.parametrize(
         'start, end, speed', [
