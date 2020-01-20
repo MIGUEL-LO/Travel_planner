@@ -24,12 +24,12 @@ def process():
                         help="Saving the plots of bus load.")
 
     arguments = parser.parse_args()
-    route = Route(route=arguments.routefile, bus_speed=arguments.speed).return_route()
+    route_ins = Route(route=arguments.routefile, bus_speed=arguments.speed)
     passengers = read_passengers(arguments.passfile)
-    timetable = route.timetable()
+    timetable = route_ins.timetable()
     passengers_ls = passengers_list(passengers)
-    journey = Journey(route, passengers_ls)
-    save_bus_map = route.plot_map(save_plot=arguments.saveplots)
+    journey = Journey(route_ins, passengers_ls)
+    save_bus_map = route_ins.plot_map(save_plot=arguments.saveplots)
     save_bus_load = journey.plot_bus_load(save_plot=arguments.saveplots)
     print(timetable)
     for i in range(len(passengers_ls)):

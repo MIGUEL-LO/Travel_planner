@@ -19,7 +19,8 @@ You can use the package in the following way, this will output most of the desir
 
 ```python
 from travelplanner import (Journey, read_passengers,
-                           Route, Passenger,         passengers_list)
+                           Route, Passenger, 
+                           passengers_list)
 
 
 route = Route("route.csv")

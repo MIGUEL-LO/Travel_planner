@@ -590,6 +590,8 @@ class Journey(Route, Passenger):
 
     # from travelplanner import Passenger, Route, Journey, read_passengers
     # from travelplanner import "passenger.csv", "route.csv"
+    # from travelplanner import (Journey, read_passengers, Route, Passenger,
+    # passengers_list)
     # route = Route("route.csv")
     # passengers = read_passengers("passenger.csv")
     # passengers_list = [Passenger(start,end,speed) for start, end, speed in
