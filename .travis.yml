@@ -10,3 +10,4 @@ install:
 script:
   - pytest --cov=./
   # - pytest-doctest-modules
+  - pytest -m doctest -v
