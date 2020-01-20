@@ -12,7 +12,7 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=['travelplanner'],
-    install_requires=['numpy', 'pandas', 'pytest', 'matplotlib', 'yaml'],
+    install_requires=['numpy', 'pandas', 'pytest', 'matplotlib', 'pyyaml'],
     entry_points={
         'console_scripts': [
             'bussimula = travelplanner.command:process'
