@@ -5,7 +5,6 @@ import pytest
 import numpy as np
 from pathlib import Path
 
-TEST_DIR = Path(__file__).parent
 
 
 class Test_passenger_class:
