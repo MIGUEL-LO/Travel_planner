@@ -33,6 +33,7 @@ class Passenger:
         >>> passengers = read_passengers("easypassenger.csv")
         >>> passenger = Passenger(passengers)
         >>> walking_t = passenger.walk_time()
+        >>> print(walking_t)
         180
         '''
         if type(self.x1) == str:

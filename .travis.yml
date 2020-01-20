@@ -10,4 +10,5 @@ install:
 script:
   - pytest --cov=./
   # - pytest-doctest-modules
+  - cd travelplanner
   - pytest -m doctest -v
