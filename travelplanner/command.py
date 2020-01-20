@@ -24,7 +24,7 @@ def process():
                         help="Saving the plots of bus load.")
 
     arguments = parser.parse_args()
-    route = Route(route=arguments.routefile, bus_speed=arguments.speed)
+    route = Route(route=arguments.routefile, bus_speed=arguments.speed).return_route()
     passengers = read_passengers(arguments.passfile)
     timetable = route.timetable()
     passengers_ls = passengers_list(passengers)
