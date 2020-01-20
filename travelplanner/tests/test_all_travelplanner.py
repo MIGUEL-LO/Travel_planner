@@ -98,20 +98,6 @@ class Test_route_class:
         assert route.route_cc() == expectation
 
     @pytest.mark.parametrize(
-        'route,expectation', [
-            ("testroute.csv", 0),
-            ("testroute2.csv", 0),
-            ("testroute3.csv", 0),
-            ("testroute4.csv", 1),
-            ("testroute5.csv", 1),
-            ("testroute6.csv", 1)
-            ]
-    )
-    def test_check_error(self, route, expectation):
-        route = Route(TEST_DIR / route)
-        assert route.check_error() == expectation
-
-    @pytest.mark.parametrize(
         'route', [
             ("testroute4.csv"),
             ("testroute5.csv"),

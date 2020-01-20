@@ -5,6 +5,8 @@ import math
 from string import ascii_uppercase as aci
 from operator import itemgetter
 
+# TEST_DIR = Path(__file__).parent
+
 
 def read_passengers(file_name):
     '''
@@ -25,14 +27,14 @@ class Passenger:
 
     def __init__(self, start, end, speed):
         '''
-
+        Description:
+        Passenger class allows the readin
         Example
         -------
-        >>> passengers = read_passengers("easypassenger.csv")
-        >>> passenger = Passenger(passengers)
-        >>> walking_t = passenger.walk_time()
+        >>> garry = Passenger((6,15),(0,0),12)
+        >>> walking_t = garry.walk_time()
         >>> print(walking_t)
-        180
+        193.86593305684212
         '''
         self.x1, self.y1 = start
         self.x2, self.y2 = end
@@ -589,8 +591,12 @@ class Journey(Route, Passenger):
 
 
 # if __name__ == "__main__":
-#     import travelplanner.all_classes_travelplanner
-#     travelplanner.all_classes_travelplanner.testmod()
+
+    # import travelplanner.all_classes_travelplanner
+    # travelplanner.all_classes_travelplanner.testmod()
+
+    # import doctest
+    # doctest.testmod()
 
     # from travelplanner import Passenger, Route, Journey, read_passengers
     # from travelplanner import "passenger.csv", "route.csv"
