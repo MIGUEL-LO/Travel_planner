@@ -5,8 +5,6 @@ import math
 from string import ascii_uppercase as aci
 from operator import itemgetter
 
-# TEST_DIR = Path(__file__).parent
-
 
 def read_passengers(file_name):
     '''
