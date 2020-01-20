@@ -29,13 +29,13 @@ passengers_list = passengers_list(passengers)
 # or
 # passengers_list = [Passenger(start,end,speed) for start, end, speed in passengers]
 journey = Journey(route,passengers_list)
-journey.plot_bus_load()
 for i in range(len(passengers_list)):
     print(journey.travel_time(i))
 journey.print_time_stats()
 for i in range(len(passengers_list)):
     print(journey.recommended_route_for_passenger(i))
-route.plot_map()
+journey.plot_bus_load(save_plot=1)
+route.plot_map(save_plot=1)
 ```
 
 Or alternativaly you can run it from the terminal as:
