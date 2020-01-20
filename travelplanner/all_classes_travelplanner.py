@@ -22,10 +22,8 @@ def read_passengers(file_name):
 
 
 class Passenger:
+
     def __init__(self, start, end, speed):
-        self.x1, self.y1 = start
-        self.x2, self.y2 = end
-        self.speed = speed
         '''
 
         Example
@@ -36,6 +34,10 @@ class Passenger:
         >>> print(walking_t)
         180
         '''
+        self.x1, self.y1 = start
+        self.x2, self.y2 = end
+        self.speed = speed
+
         if type(self.x1) == str:
             raise Exception('x_1 coordinate should not be a letter but a'
                             'number. The value of x_1 was: {}'.format(self.x1))
@@ -77,7 +79,7 @@ class Route:
     def __init__(self, route, bus_speed=10):
         self.route = route
         self.bus_speed = bus_speed
-        self.return_route
+        self.return_route()
 
     def read_route(self):
         '''
